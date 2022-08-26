@@ -10,6 +10,8 @@ namespace MCFBuilder
     internal class ScriptVisitor : MCFBuilderBaseVisitor<object?>
     {
         Dictionary<string, object?> Variables { get; } = new();
+        Dictionary<string, Dictionary<string, object?>> functionVariables { get; set; } = new();
+        Dictionary<string,List<string>> tempVariables = new();
         string[] BuiltInFunctions { get; } =
         {
             "Write"
@@ -29,10 +31,34 @@ namespace MCFBuilder
 
             return null;
         }
-        //TODO: finish it
-        public override object? VisitAssignFcuntion(MCFBuilderParser.AssignFcuntionContext context)
+        //TODO: get the inputs
+
+        
+        public override object? VisitAssignFunction(MCFBuilderParser.AssignFunctionContext context)
         {
-            
+            var funcName = context.IDENTIFIER(0);
+            Dictionary<string,object?> varArgs = new();
+            foreach (var item in context.IDENTIFIER().Where(v => v != funcName))
+            {
+                if (Variables.ContainsKey(item.GetText()))
+                    throw new Exception($"Variable '{item.GetText()}' must not be duplicated with existing variables");
+                varArgs.Add(item.GetText(),null);
+            }
+            functionVariables[funcName.GetText()] = varArgs;
+            //tempVariables = (from i in varArgs select i.Key).ToList();
+
+            Variables[funcName.GetText()] = new Func<object?[], object?>(args => {
+                if (args.Length != varArgs.Count)
+                    throw new Exception("Missing Arguments");
+                for (int i = 0; i < varArgs.Count; i++)
+                {
+                    functionVariables[funcName.GetText()][varArgs.ElementAt(i).Key] = args[i];
+                }
+                return Visit(context.block());
+            });
+
+
+            return null;
         }
 
         public override object? VisitFunctionCall(MCFBuilderParser.FunctionCallContext context)
@@ -46,19 +72,31 @@ namespace MCFBuilder
             if (Variables[name] is not Func<object?[], object?> func)
                 throw new Exception($"Variables {name} is not a function");
 
+            if (!BuiltInFunctions.Contains(name))
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    var variables = functionVariables[name];
+                    functionVariables[name][variables.ElementAt(i).Key] = args[i];
+                    tempVariables = new Dictionary<string, List<string>> { [name] = (from v in variables select v.Key).ToList() };
+                }
+            }
+
             return func(args);
         }
 
+        //TODO: let user define 'local' and 'global'
         public override object? VisitAssignment(MCFBuilderParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
             var value = Visit(context.expression());
 
+            
+
             if (BuiltInFunctions.Contains(varName))
                 throw new Exception($"Unable to modify buily in function {varName}");
 
             Variables[varName] = value;
-
             return null;
         }
 
@@ -68,6 +106,14 @@ namespace MCFBuilder
 
             if (!Variables.ContainsKey(varName))
             {
+                foreach (string key in tempVariables.Keys)
+                {
+                    if (tempVariables[key].Contains(varName))
+                    {
+                        return functionVariables[key][varName];
+                    }
+                }
+                tempVariables.Clear();
                 throw new Exception($"Variables {varName} is not defined");
             }
 

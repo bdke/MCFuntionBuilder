@@ -1,0 +1,27 @@
+i = 1;
+name = 'Good morning "amogus"';
+
+if (i > 4) {
+	i = i + 1;
+	Write("sad");
+}
+else if (i == 1) {
+	Write("amogus");
+}
+else {
+	Write("nmsl");
+}
+
+for (i in 0 to 3) {
+	Write("sad");
+}
+
+sad = {"sad" : 3, "amogus" : 4.2};
+Write(sad);
+
+mogus = [1,1.2,3,"sad"];
+Write(mogus);
+
+for (item in sad) {
+	Write(item);
+}

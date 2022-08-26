@@ -2,7 +2,7 @@ grammar MCFBuilder;
 
 program: line* EOF;
 
-line: statement | ifBlock | whileBlock | forBlock;
+line: assignFunction | statement | ifBlock | whileBlock | forBlock;
 
 statement: (assignment | functionCall) SEMI;
 
@@ -14,11 +14,15 @@ WHILE: 'while';
 
 forBlock: 'for' '(' IDENTIFIER 'in' (INTEGER 'to' INTEGER | dict | list | IDENTIFIER) ')' block;
 
-assignFcuntion: 'def' IDENTIFIER '(' IDENTIFIER* ')' block ;
+assignFunction: 'def' IDENTIFIER '(' IDENTIFIER (',' IDENTIFIER)* ')' block ;
 
-assignment: IDENTIFIER '=' expression;
+assignment: VARIABLES_TYPE IDENTIFIER '=' expression;
+VARIABLES_TYPE: ('var' | 'local' |'global') ;
+
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')'; 
+
+
 
 expression
     : constant  #constantExpression
