@@ -1,10 +1,9 @@
 grammar MCFBuilder;
-
 program: line* EOF;
 
-line: assignFunction | statement | ifBlock | whileBlock | forBlock;
+line: assignFunction | statement | ifBlock | whileBlock | forBlock | assignFile | COMMENT;
 
-statement: (assignment | functionCall) SEMI;
+statement: (assignment | functionCall | return) SEMI;
 
 ifBlock: 'if' '(' expression ')' block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
@@ -14,15 +13,19 @@ WHILE: 'while';
 
 forBlock: 'for' '(' IDENTIFIER 'in' (INTEGER 'to' INTEGER | dict | list | IDENTIFIER) ')' block;
 
-assignFunction: 'def' IDENTIFIER '(' IDENTIFIER (',' IDENTIFIER)* ')' block ;
+assignFunction: 'def' IDENTIFIER '(' IDENTIFIER? (',' IDENTIFIER)* ')' block ;
 
-assignment: VARIABLES_TYPE IDENTIFIER '=' expression;
-VARIABLES_TYPE: ('var' | 'local' |'global') ;
+assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
 
+
+assignment: (VARIABLES_TYPE)? IDENTIFIER '=' expression | (VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector '=' expression ;
+selector: ('@' 's'|'a'|'r'|'e'|'p')? ('[' STRING? ']')?;
+
+VARIABLES_TYPE: ('var' | 'global') ;
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')'; 
 
-
+return: 'return' expression;
 
 expression
     : constant  #constantExpression
@@ -58,6 +61,7 @@ NULL: 'null';
 
 block: '{' line* '}';
 
+COMMENT: '//' ~[\r\n]* -> skip ;
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 SEMI: ';';

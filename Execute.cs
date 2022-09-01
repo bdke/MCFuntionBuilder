@@ -17,6 +17,7 @@ namespace MCFBuilder
             var lexer = new MCFBuilderLexer(inputStream);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             MCFBuilderParser parser = new MCFBuilderParser(tokens);
+            parser.AddErrorListener(new SyntaxErrorListener());
             var context = parser.program();
             ScriptVisitor visitor = new ScriptVisitor();
             visitor.Visit(context);
@@ -27,4 +28,5 @@ namespace MCFBuilder
             Run("Test/test.mcf");
         }
     }
+
 }

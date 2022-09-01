@@ -1,10 +1,15 @@
-local sad = 3;
-
-def TEST(amogus) {
-	Write("AMOGUS");
-	Write(amogus);
+#sad:
+def rs() {
+    return 4;
 }
 
-TEST("sad");
-TEST(432423523);
-Write("after");
+var sa:dummy @s = rs();
+
+Write(sa);
+
+sa:dummy @s = 5;
+sa = 6;
+
+Write(sa);
+
+

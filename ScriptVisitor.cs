@@ -3,23 +3,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using MCFBuilder.Utility;
+using MCFBuilder.Type;
 
 namespace MCFBuilder
 {
     internal class ScriptVisitor : MCFBuilderBaseVisitor<object?>
     {
+        string? currentFile = null;
         Dictionary<string, object?> Variables { get; } = new();
         Dictionary<string, Dictionary<string, object?>> functionVariables { get; set; } = new();
         Dictionary<string,List<string>> tempVariables = new();
+        List<ScoreboardValues> scoreboardValues = new();
         string[] BuiltInFunctions { get; } =
         {
-            "Write"
+            "Write","LoadFile"
         };
 
         public ScriptVisitor()
         {
-            Variables["Write"] = new Func<object?[], object?>(Write);
+            InitFunctions();
         }
 
         private object? Write(object?[] args)
@@ -31,9 +37,38 @@ namespace MCFBuilder
 
             return null;
         }
-        //TODO: get the inputs
 
-        
+        private async Task<object?> LoadFile(object?[] arg)
+        {
+            string? result = null;
+            if (arg != null)
+            {
+#pragma warning disable CS8602 // 可能有 Null 參考引數。
+#pragma warning disable CS8604 // 可能有 Null 參考引數。
+                result = File.ReadAllText(arg[0].ToString());
+#pragma warning restore CS8604 // 可能有 Null 參考引數。
+#pragma warning restore CS8602 // 可能有 Null 參考引數。
+                Console.WriteLine(await CSharpScript.EvaluateAsync(result));
+            }
+            return result;
+        }
+
+        private void InitFunctions()
+        {
+            Variables["Write"] = new Func<object?[], object?>(Write);
+            Variables["LoadFile"] = new Func<object?[], object?>(LoadFile);
+        }
+
+        public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
+        {
+            currentFile = context.GetText().Remove(0,1).Replace(":","");
+            Variables.Clear();
+            tempVariables.Clear();
+            functionVariables.Clear();
+            InitFunctions();
+            return null;
+        }
+
         public override object? VisitAssignFunction(MCFBuilderParser.AssignFunctionContext context)
         {
             var funcName = context.IDENTIFIER(0);
@@ -45,7 +80,6 @@ namespace MCFBuilder
                 varArgs.Add(item.GetText(),null);
             }
             functionVariables[funcName.GetText()] = varArgs;
-            //tempVariables = (from i in varArgs select i.Key).ToList();
 
             Variables[funcName.GetText()] = new Func<object?[], object?>(args => {
                 if (args.Length != varArgs.Count)
@@ -54,11 +88,25 @@ namespace MCFBuilder
                 {
                     functionVariables[funcName.GetText()][varArgs.ElementAt(i).Key] = args[i];
                 }
-                return Visit(context.block());
+                Visit(context.block());
+                var children = context.block().children.ToList();
+                foreach (var child in children)
+                {
+                    if (child.GetChild(0) != null) {
+                        var s = child.GetChild(0).GetChild(0);
+                        if (s is MCFBuilderParser.ReturnContext)
+                        {
+                            return Visit(s);
+                        }
+                    }
+                }
+                return null;
             });
-
-
             return null;
+        }
+        public override object? VisitReturn(MCFBuilderParser.ReturnContext context)
+        {
+            return Visit(context.expression());
         }
 
         public override object? VisitFunctionCall(MCFBuilderParser.FunctionCallContext context)
@@ -74,6 +122,10 @@ namespace MCFBuilder
 
             if (!BuiltInFunctions.Contains(name))
             {
+                if (args.Length == 0)
+                {
+                    tempVariables = new Dictionary<string, List<string>>() { [name] = new() };
+                }
                 for (int i = 0; i < args.Length; i++)
                 {
                     var variables = functionVariables[name];
@@ -85,24 +137,116 @@ namespace MCFBuilder
             return func(args);
         }
 
-        //TODO: let user define 'local' and 'global'
         public override object? VisitAssignment(MCFBuilderParser.AssignmentContext context)
         {
-            var varName = context.IDENTIFIER().GetText();
+            string modifier = context.GetChild(0).GetText();
+            var varName = context.IDENTIFIER(0).GetText();
             var value = Visit(context.expression());
 
-            
+            string? scoreboardType = null;
+            if (context.GetChild(2).GetText() == ":")
+                if (value is not int)
+                    throw new Exception("Scoreboard must be a int");
+            scoreboardType = (context.IDENTIFIER(1) != null) ? context.IDENTIFIER(1).GetText() : null;
 
+            var scoreboardNames = from i in scoreboardValues
+                                  where i.Modifier == "ROOT" || i.Modifier == currentFile
+                                  select i.Name;
+
+
+            
             if (BuiltInFunctions.Contains(varName))
                 throw new Exception($"Unable to modify buily in function {varName}");
 
-            Variables[varName] = value;
+            if (modifier != "var" && modifier != "global")
+            {
+                if (scoreboardType == null)
+                {
+                    if (scoreboardNames.Contains(varName))
+                        throw new Exception();
+
+                    if (ProgramVariables.globalVariables.ContainsKey(varName))
+                    {
+                        ProgramVariables.globalVariables[varName] = value;
+                    }
+                    else if (Variables.ContainsKey(varName))
+                    {
+                        Variables[varName] = value;
+                    }
+                    else
+                    {
+                        
+                        throw new Exception($"Variable '{varName}' is not existed");
+                    }
+                }
+                else
+                {
+                    if (value is not int)
+                        throw new Exception();
+
+                    if (scoreboardNames.Contains(varName))
+                    {
+                        scoreboardValues.Where(v => v.Name == varName).ElementAt(0).Value = (int?)value;
+                    }
+                }
+            }
+            else
+            {
+                if (scoreboardType == null)
+                {
+                    if (modifier == "var")
+                    {
+                        if (Variables.ContainsKey(varName))
+                            throw new Exception();
+                        Variables[varName] = value;
+                    }
+                    else if (modifier == "global")
+                    {
+                        if (ProgramVariables.globalVariables.ContainsKey(varName))
+                            throw new Exception();
+                        ProgramVariables.globalVariables[varName] = value;
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+                    if (modifier == "var")
+                    {
+                        if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+                            throw new Exception();
+                        scoreboardValues.Add(new(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, currentFile));
+                    }
+                    else if (modifier == "global")
+                    {
+                        if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+                            throw new Exception();
+                        scoreboardValues.Add(new(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, ScoreboardValues.RootPath));
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
             return null;
         }
 
         public override object? VisitIdentifierExpression(MCFBuilderParser.IdentifierExpressionContext context)
         {
             var varName = context.IDENTIFIER().GetText();
+
+            if (ProgramVariables.globalVariables.ContainsKey(varName))
+            {
+                return ProgramVariables.globalVariables[varName];
+            }
+
+            if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+            {
+                return scoreboardValues.Where(v => v.Name == varName).ToList()[0].Value;
+            }
 
             if (!Variables.ContainsKey(varName))
             {
@@ -114,7 +258,7 @@ namespace MCFBuilder
                     }
                 }
                 tempVariables.Clear();
-                throw new Exception($"Variables {varName} is not defined");
+                throw new Exception($"Variables '{varName}' is not defined");
             }
 
             return Variables[varName];
@@ -130,7 +274,7 @@ namespace MCFBuilder
             if (context.STRING() is { } s)
                 return s.GetText()[1..^1];
             if (context.BOOL() is { } b)
-                return b.GetText() == "true";
+                return (context.GetChild(0).GetText() == "!") ? !(b.GetText() == "true") : b.GetText() == "true";
             if (context.NULL() is { })
                 return null;
             if (context.dict() is { } d)
@@ -193,16 +337,35 @@ namespace MCFBuilder
         public override object? VisitForBlock(MCFBuilderParser.ForBlockContext context)
         {
             var varName = context.IDENTIFIER(0).GetText();
+
+            bool isInsideFunc = false;
+            var parent = context.parent;
+            while (parent != null)
+            {
+                if (parent.parent is MCFBuilderParser.AssignFunctionContext)
+                {
+                    isInsideFunc = true;
+                    parent = parent.parent;
+                    break;
+                }
+                parent = parent.parent;
+            }
+
             if (context.INTEGER().Length > 0)
             {
-
                 var start = int.Parse(context.INTEGER(0).GetText());
                 var end = int.Parse(context.INTEGER(1).GetText());
 
-                Variables[varName] = context.INTEGER(0);
+                //Variables[varName] = context.INTEGER(0);
                 for (int i = start; i < end; i++)
                 {
-                    Variables[varName] = i;
+                    if (!isInsideFunc)
+                        Variables[varName] = i;
+                    else if (parent != null)
+                    {
+                        tempVariables[parent.GetChild(1).GetText()].Add(varName);
+                        functionVariables[parent.GetChild(1).GetText()][varName] = i;
+                    }
                     Visit(context.block());
                     
                 }
