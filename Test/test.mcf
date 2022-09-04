@@ -1,15 +1,4 @@
 #sad:
-def rs() {
-    return 4;
-}
-
-var sa:dummy @s = rs();
-
-Write(sa);
-
-sa:dummy @s = 5;
-sa = 6;
-
-Write(sa);
+Write(4*(4+(8-4)));
 
 

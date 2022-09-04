@@ -40,8 +40,8 @@ expression
 ;
 
 //operator
-multOp: '*' | '/' | '%';
-addOp: '+' | '-';
+multOp: '*' | '/' | '%=' | '*=' | '/=' | '%=';
+addOp: '+' | '-' | '+=' | '-=' ;
 compareOp: '==' | '!=' | '>' | '<' | '<=' | '>=';
 boolOp: BOOL_OPERATOR;
 

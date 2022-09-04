@@ -14,12 +14,14 @@ namespace MCFBuilder.Type
         public int? Value { get; set; }
         public string Name { get; set; }
         public string? Modifier { get; set; }
-        public ScoreboardValues(ScoreboardTypes scoreboardType, int? value, string name, string? modifier)
+        public string Operator { get; set; }
+        public ScoreboardValues(ScoreboardTypes scoreboardType, int? value, string name, string? modifier , string @operator)
         {
             ScoreboardType = scoreboardType;
             Value = value;
             Name = name;
             Modifier = modifier;
+            Operator = @operator;
         }
 
         public static ScoreboardTypes GetScoreboardTypes(string type)
