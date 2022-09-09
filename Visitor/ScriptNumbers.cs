@@ -8,7 +8,6 @@ namespace MCFBuilder
 {
     public partial class ScriptVisitor
     {
-        //TODO: plus equal...
         public override object? VisitAdditiveExpression(MCFBuilderParser.AdditiveExpressionContext context)
         {
             var left = Visit(context.expression(0));

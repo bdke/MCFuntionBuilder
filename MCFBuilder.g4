@@ -18,8 +18,8 @@ assignFunction: 'def' IDENTIFIER '(' IDENTIFIER? (',' IDENTIFIER)* ')' block ;
 assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
 
 
-assignment: (VARIABLES_TYPE)? IDENTIFIER '=' expression | (VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector '=' expression ;
-selector: ('@' 's'|'a'|'r'|'e'|'p')? ('[' STRING? ']')?;
+assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression);
+selector: ('@' ('s'|'a'|'r'|'e'|'p') | IDENTIFIER)? ('[' IDENTIFIER? ']')?;
 
 VARIABLES_TYPE: ('var' | 'global') ;
 
@@ -40,10 +40,12 @@ expression
 ;
 
 //operator
-multOp: '*' | '/' | '%=' | '*=' | '/=' | '%=';
-addOp: '+' | '-' | '+=' | '-=' ;
+multOp: '*' | '/';
+addOp: '+' | '-' ;
 compareOp: '==' | '!=' | '>' | '<' | '<=' | '>=';
 boolOp: BOOL_OPERATOR;
+
+assignOp: '=' | '+=' | '-=' | '%=' | '*=' | '/=' ;
 
 BOOL_OPERATOR: '&&' | '||';
 

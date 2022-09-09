@@ -52,9 +52,14 @@ namespace MCFBuilder
 
         public override object? VisitAssignment(MCFBuilderParser.AssignmentContext context)
         {
+            #region Datas
             string modifier = context.GetChild(0).GetText();
             var varName = context.IDENTIFIER(0).GetText();
             var value = Visit(context.expression());
+            var assignOp = context.assignOp().GetText();
+
+            //TODO get second scoreboard+
+            var variableOperation = context.selector(1).GetText();
 
             string? scoreboardType = null;
             if (context.GetChild(2).GetText() == ":")
@@ -62,11 +67,14 @@ namespace MCFBuilder
                     throw new Exception("Scoreboard must be a int");
             scoreboardType = (context.IDENTIFIER(1) != null) ? context.IDENTIFIER(1).GetText() : null;
 
-            var scoreboardNames = from i in scoreboardValues
-                                  where i.Modifier == "ROOT" || i.Modifier == currentFile
-                                  select i.Name;
+            var scoreboardNames = from i in scoreboards
+                                  where i.ScoreboardValues.Modifier == "ROOT" || i.ScoreboardValues.Modifier == currentFile
+                                  select i.ScoreboardValues.Name;
 
-
+            var globalScoreboardNames = from i in ProgramVariables.ScoreboardObjects
+                                        where i.ScoreboardValues.Modifier == "ROOT" || i.ScoreboardValues.Modifier == currentFile
+                                        select i.ScoreboardValues.Name;
+            #endregion
 
             if (BuiltInFunctions.Contains(varName))
                 throw new Exception($"Unable to modify buily in function {varName}");
@@ -80,15 +88,32 @@ namespace MCFBuilder
 
                     if (ProgramVariables.globalVariables.ContainsKey(varName))
                     {
-                        ProgramVariables.globalVariables[varName] = value;
+                        ProgramVariables.globalVariables[varName] = assignOp switch
+                        {
+                            "=" => value,
+                            "+=" => Add(ProgramVariables.globalVariables[varName], value),
+                            "-=" => Subtract(ProgramVariables.globalVariables[varName], value),
+                            "*=" => Multiply(ProgramVariables.globalVariables[varName], value),
+                            "%=" => Remainder(ProgramVariables.globalVariables[varName], value),
+                            "/=" => Divide(ProgramVariables.globalVariables[varName], value),
+                            _ => throw new NotImplementedException(),
+                        };
                     }
                     else if (Variables.ContainsKey(varName))
                     {
-                        Variables[varName] = value;
+                        Variables[varName] = assignOp switch
+                        {
+                            "=" => value,
+                            "+=" => Add(Variables[varName] ,value),
+                            "-=" => Subtract(Variables[varName], value),
+                            "*=" => Multiply(Variables[varName], value),
+                            "%=" => Remainder(Variables[varName], value),
+                            "/=" => Divide(Variables[varName], value),
+                            _ => throw new NotImplementedException()
+                        };
                     }
                     else
                     {
-
                         throw new Exception($"Variable '{varName}' is not existed");
                     }
                 }
@@ -99,7 +124,125 @@ namespace MCFBuilder
 
                     if (scoreboardNames.Contains(varName))
                     {
-                        scoreboardValues.Where(v => v.Name == varName).ElementAt(0).Value = (int?)value;
+                        var scoreboard = scoreboards.Where(v => v.ScoreboardValues.Name == varName).ElementAt(0);
+                        switch (assignOp)
+                        {
+                            case "=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Set(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Set((int?)value, context.selector(0).GetText());
+                                break;
+                            case "+=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Add(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Add((int?)value, context.selector(0).GetText());
+                                break;
+                            case "-=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Subtract(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Subtract((int?)value, context.selector(0).GetText());
+                                break;
+                            case "*=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Multiply(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Multiply((int?)value, context.selector(0).GetText());
+                                break;
+                            case "/=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Divide(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Divide((int?)value, context.selector(0).GetText());
+                                break;
+                            case "%=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Remainder(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Remainder((int?)value, context.selector(0).GetText());
+                                break;
+                            default:
+                                break;
+                        }
+
+                        scoreboard.ScoreboardValues.Value = assignOp switch
+                        {
+                            "=" => (int?)value,
+                            "+=" => scoreboard.ScoreboardValues.Value + (int)value,
+                            "-=" => scoreboard.ScoreboardValues.Value - (int)value,
+                            "*=" => scoreboard.ScoreboardValues.Value * (int)value,
+                            "/=" => scoreboard.ScoreboardValues.Value / (int)value,
+                            "%=" => scoreboard.ScoreboardValues.Value % (int)value,
+                            _ => throw new NotImplementedException()
+                        };
+                    }
+                    else if (globalScoreboardNames.Contains(varName))
+                    {
+                        var scoreboard =
+                        ProgramVariables.ScoreboardObjects
+                            .Where(v => v.ScoreboardValues.Name == varName)
+                            .ElementAt(0);
+
+                        switch (assignOp)
+                        {
+                            case "=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Set(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Set((int?)value, context.selector(0).GetText());
+                                break;
+                            case "+=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Add(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Add((int?)value, context.selector(0).GetText());
+                                break;
+                            case "-=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Subtract(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Subtract((int?)value, context.selector(0).GetText());
+                                break;
+                            case "*=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Multiply(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Multiply((int?)value, context.selector(0).GetText());
+                                break;
+                            case "/=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Divide(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Divide((int?)value, context.selector(0).GetText());
+                                break;
+                            case "%=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Remainder(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                else
+                                    scoreboard.Remainder((int?)value, context.selector(0).GetText());
+                                break;
+                            default:
+                                break;
+                        }
+
+                        scoreboard.ScoreboardValues.Value = assignOp switch
+                        {
+                            "=" => (int?)value,
+                            "+=" => scoreboard.ScoreboardValues.Value + (int)value,
+                            "-=" => scoreboard.ScoreboardValues.Value - (int)value,
+                            "*=" => scoreboard.ScoreboardValues.Value * (int)value,
+                            "/=" => scoreboard.ScoreboardValues.Value / (int)value,
+                            "%=" => scoreboard.ScoreboardValues.Value % (int)value,
+                            _ => throw new NotImplementedException()
+                        };
+                        scoreboard.Set((int?)value, context.selector(0).GetText());
+
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
                     }
                 }
             }
@@ -121,26 +264,97 @@ namespace MCFBuilder
                     }
                     else
                     {
-
+                        throw new NotImplementedException();
                     }
                 }
                 else
                 {
                     if (modifier == "var")
                     {
-                        if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+                        if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Count() > 0)
                             throw new Exception();
-                        scoreboardValues.Add(new(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, currentFile, "="));
+                        var scoreboardValues = new ScoreboardValues(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, currentFile);
+                        Scoreboard scoreboard = new(scoreboardValues);
+                        switch (assignOp)
+                        {
+                            case "=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Set(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "+=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Add(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "-=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Subtract(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "*=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Multiply(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "/=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Divide(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "%=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Remainder(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            default:
+                                break;
+                        }
+                        scoreboards.Add(scoreboard);
+                        if (value != null)
+                        {
+                            scoreboard.Set((int?)value, context.selector(0).GetText());
+                        }
                     }
                     else if (modifier == "global")
                     {
-                        if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+                        if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Count() > 0)
                             throw new Exception();
-                        scoreboardValues.Add(new(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, ScoreboardValues.RootPath, "="));
+                        ScoreboardValues scoreboardValues = new(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, ScoreboardValues.RootPath);
+                        Scoreboard scoreboard = new(scoreboardValues);
+                        switch (assignOp)
+                        {
+                            case "=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Set(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "+=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Add(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "-=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Subtract(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "*=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Multiply(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "/=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Divide(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            case "%=":
+                                if (variableOperation.Length > 0)
+                                    scoreboard.Remainder(context.expression().GetText(), context.selector(0).GetText(), context.selector(1).GetText());
+                                break;
+                            default:
+                                break;
+                        }
+                        ProgramVariables.ScoreboardObjects.Add(scoreboard);
+
+                        if (value != null)
+                        {
+                            ProgramVariables.ScoreboardInitValues[scoreboard] = (string?)context.selector(0).GetText();
+                        }
                     }
                     else
                     {
-
+                        throw new NotImplementedException();
                     }
                 }
             }
@@ -156,9 +370,14 @@ namespace MCFBuilder
                 return ProgramVariables.globalVariables[varName];
             }
 
-            if (scoreboardValues.Where(v => v.Name == varName).Count() > 0)
+            if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Count() > 0)
             {
-                return scoreboardValues.Where(v => v.Name == varName).ToList()[0].Value;
+                return scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList()[0].ScoreboardValues.Value;
+            }
+
+            if (ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == varName).Count() > 0)
+            {
+                return ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == varName).ElementAt(0).ScoreboardValues.Value;
             }
 
             if (!Variables.ContainsKey(varName))

@@ -17,7 +17,7 @@ namespace MCFBuilder
         Dictionary<string, object?> Variables { get; } = new();
         Dictionary<string, Dictionary<string, object?>> functionVariables { get; set; } = new();
         Dictionary<string,List<string>> tempVariables = new();
-        List<ScoreboardValues> scoreboardValues = new();
+        List<Scoreboard> scoreboards = new();
         List<string>? tempOperators = null;
         string[] BuiltInFunctions { get; } =
         {
@@ -62,12 +62,27 @@ namespace MCFBuilder
 
         public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
         {
+            RemoveScoreboards();
             currentFile = context.GetText().Remove(0,1).Replace(":","");
+            FunctionCompiler.Lines = new();
+            FunctionCompiler.Lines.Lines = new();
+            FunctionCompiler.Lines.FilePath = currentFile;
             Variables.Clear();
             tempVariables.Clear();
             functionVariables.Clear();
+            scoreboards.Clear();
             InitFunctions();
             return null;
+        }
+
+        public void RemoveScoreboards()
+        {
+            foreach (var item in scoreboards)
+            {
+                FunctionCompiler.Lines.Lines.Add($"scoreboard objectives remove {item.ScoreboardValues.Name}");
+            }
+            if (currentFile != null)
+                File.WriteAllText(currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
         }
 
         public override object? VisitWhileBlock(MCFBuilderParser.WhileBlockContext context)
@@ -175,11 +190,11 @@ namespace MCFBuilder
             return null;
         }
 
-        
-
         public override object? VisitIfBlock(MCFBuilderParser.IfBlockContext context)
         {
-            if (IsTrue(Visit(context.expression())))
+            var exp = context.expression();
+
+            if (IsTrue(Visit(exp)))
             {
                 Visit(context.block());
             }
