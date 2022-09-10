@@ -18,7 +18,9 @@ assignFunction: 'def' IDENTIFIER '(' IDENTIFIER? (',' IDENTIFIER)* ')' block ;
 assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
 
 
-assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression);
+assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) 
+            | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression) 
+            | ((VARIABLES_TYPE)? IDENTIFIER selector assignOp expression);
 selector: ('@' ('s'|'a'|'r'|'e'|'p') | IDENTIFIER)? ('[' IDENTIFIER? ']')?;
 
 VARIABLES_TYPE: ('var' | 'global') ;

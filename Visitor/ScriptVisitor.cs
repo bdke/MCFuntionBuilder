@@ -19,6 +19,7 @@ namespace MCFBuilder
         Dictionary<string,List<string>> tempVariables = new();
         List<Scoreboard> scoreboards = new();
         List<string>? tempOperators = null;
+        List<TagsType> tags = new();
         string[] BuiltInFunctions { get; } =
         {
             "Write","LoadFile"

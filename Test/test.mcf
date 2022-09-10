@@ -1,28 +1,10 @@
-// #sad:
-// def rs() {
-//     return 4;
-// }
-
-// var sa:dummy @s = rs();
-// sa:dummy @s = sa + 5;
-
-
-// Write(sa);
-
-// #yummy:
-
-// var sad:dummy @a = 4;
-
 #sad:
 var john:dummy @s = 3;
 
 global amogus:dummy @a = 2;
 
 var sa:dummy @a = 2; 
-sa:dummy @a *= john @s;
+sa:dummy @a += john @s;
 Write(sa);
 
-
-for (i in 1 to 5) { 
-    sa:dummy @a = 2; 
-}
+var anmo @s = true;

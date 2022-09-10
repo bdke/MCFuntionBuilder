@@ -106,9 +106,22 @@ namespace MCFBuilder.Utility
             FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} = {selector2} {name}");
         }
 
-        public void EqualID(object? value, string? selector, string? selector2)
+        //public void EqualID(object? value, string? selector, string? selector2)
+        //{
+        //    FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} = {value} {selector2}");
+        //}
+    }
+
+    public static class Tags
+    {
+        public static void Add(string? name, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} = {value} {selector2}");
+            FunctionCompiler.Lines.Lines.Add($"tag {selector} add {name}");
+        }
+
+        public static void Remove(string? name, string? selector)
+        {
+            FunctionCompiler.Lines.Lines.Add($"tag {selector} remove {name}");
         }
     }
 }

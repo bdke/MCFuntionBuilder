@@ -58,8 +58,10 @@ namespace MCFBuilder
             var value = Visit(context.expression());
             var assignOp = context.assignOp().GetText();
 
-            //TODO get second scoreboard+
-            var variableOperation = context.selector(1).GetText();
+            //TODO get second scoreboard
+            string? variableOperation = "";
+            if (context.selector(1) != null)
+                variableOperation = context.selector(1).GetText();
 
             string? scoreboardType = null;
             if (context.GetChild(2).GetText() == ":")
@@ -81,7 +83,32 @@ namespace MCFBuilder
 
             if (modifier != "var" && modifier != "global")
             {
-                if (scoreboardType == null)
+                //command /tag
+                if (value is bool valueBool && context.selector(0) != null)
+                {
+                    var localTags = tags.Where(x => x.Name == varName);
+                    var globalTags = ProgramVariables.Tags.Where(v => v.Name == varName);
+
+                    if (localTags.Any())
+                    {
+                        localTags.ToList().ForEach(v => v.Value = valueBool);
+                    }
+                    else if (globalTags.Any())
+                    {
+                        globalTags.ToList().ForEach(v => v.Value = valueBool);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                    if (valueBool)
+                        Tags.Add(varName, context.selector(0).GetText());
+                    else
+                        Tags.Remove(varName, context.selector(0).GetText());
+                    
+                }
+                else if (scoreboardType == null)
                 {
                     if (scoreboardNames.Contains(varName))
                         throw new Exception();
@@ -237,7 +264,6 @@ namespace MCFBuilder
                             "%=" => scoreboard.ScoreboardValues.Value % (int)value,
                             _ => throw new NotImplementedException()
                         };
-                        scoreboard.Set((int?)value, context.selector(0).GetText());
 
                     }
                     else
@@ -248,6 +274,37 @@ namespace MCFBuilder
             }
             else
             {
+                if (value is bool valueBool && context.selector(0) != null)
+                {
+                    var localTags = tags.Where(x => x.Name == varName);
+                    var globalTags = ProgramVariables.Tags.Where(x => x.Name == varName);
+
+                    if (localTags.Any() || globalTags.Any())
+                    {
+                        throw new Exception($"variable {varName} already exists");
+                    }
+
+                    if (modifier == "var")
+                    {
+                        tags.Add(new() { 
+                            Name = varName, 
+                            Value = valueBool, 
+                            Selector = context.selector(0).GetText() 
+                        });
+                    }
+                    else
+                    {
+                        ProgramVariables.Tags.Add(new() { 
+                            Name = varName,
+                            Value = valueBool, 
+                            Selector = context.selector(0).GetText() 
+                        });
+                    }
+                    if (valueBool)
+                        Tags.Add(varName, context.selector(0).GetText());
+                    else
+                        Tags.Remove(varName, context.selector(0).GetText());
+                }
                 if (scoreboardType == null)
                 {
                     if (modifier == "var")
@@ -271,10 +328,13 @@ namespace MCFBuilder
                 {
                     if (modifier == "var")
                     {
+                        //test if the scoreboard already exists
                         if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Count() > 0)
                             throw new Exception();
                         var scoreboardValues = new ScoreboardValues(ScoreboardValues.GetScoreboardTypes(scoreboardType), (int?)value, varName, currentFile);
                         Scoreboard scoreboard = new(scoreboardValues);
+
+                        
                         switch (assignOp)
                         {
                             case "=":
