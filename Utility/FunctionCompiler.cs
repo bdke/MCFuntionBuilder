@@ -25,12 +25,7 @@ namespace MCFBuilder.Utility
         public Scoreboard(ScoreboardValues scoreboardValues)
         {
             this.ScoreboardValues = scoreboardValues;
-
-            if (scoreboardValues.Modifier == ScoreboardValues.RootPath)
-            {
-                //TODO create scoreboard in load.mcfuntion
-            }
-            else
+            if (scoreboardValues.Modifier != ScoreboardValues.RootPath)
             {
                 FunctionCompiler.Lines
                     .FilePath = scoreboardValues.Modifier;

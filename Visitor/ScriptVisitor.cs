@@ -81,9 +81,17 @@ namespace MCFBuilder
             foreach (var item in scoreboards)
             {
                 FunctionCompiler.Lines.Lines.Add($"scoreboard objectives remove {item.ScoreboardValues.Name}");
+                
+            }
+
+            foreach (var item in tags)
+            {
+                FunctionCompiler.Lines.Lines.Add($"tag @e remove {item.Name}");
             }
             if (currentFile != null)
+            {
                 File.WriteAllText(currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
+            }
         }
 
         public override object? VisitWhileBlock(MCFBuilderParser.WhileBlockContext context)

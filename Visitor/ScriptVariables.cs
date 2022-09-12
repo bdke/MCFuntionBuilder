@@ -58,7 +58,6 @@ namespace MCFBuilder
             var value = Visit(context.expression());
             var assignOp = context.assignOp().GetText();
 
-            //TODO get second scoreboard
             string? variableOperation = "";
             if (context.selector(1) != null)
                 variableOperation = context.selector(1).GetText();

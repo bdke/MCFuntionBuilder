@@ -7,4 +7,7 @@ var sa:dummy @a = 2;
 sa:dummy @a += john @s;
 Write(sa);
 
-var anmo @s = true;
+global anmo @s = true;
+
+#amogus:
+anmo @s = false;
