@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MCFBuilder.Type
 {
-    public struct TagsType
+    public class TagsType
     {
         public string? Name { get; set; }
-        public bool? Value { get; set; }
+        public Dictionary<string, bool>? Value { get; set; }
         public string? Selector { get; set; }
         
     }

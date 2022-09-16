@@ -52,10 +52,10 @@ namespace MCFBuilder
         public override object? VisitFunctionCall(MCFBuilderParser.FunctionCallContext context)
         {
             var name = context.IDENTIFIER().GetText();
-            var args = context.expression().Select(Visit).ToArray();
-
+            var args = context.expression().Select(Visit).ToArray(); 
+            
             if (!Variables.ContainsKey(name))
-                throw new Exception($"Function {name} is not defined");
+                throw new Exception($"'{name}' is not defined");
 
             if (Variables[name] is not Func<object?[], object?> func)
                 throw new Exception($"Variables {name} is not a function");

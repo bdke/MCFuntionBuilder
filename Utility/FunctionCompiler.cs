@@ -25,10 +25,10 @@ namespace MCFBuilder.Utility
         public Scoreboard(ScoreboardValues scoreboardValues)
         {
             this.ScoreboardValues = scoreboardValues;
-            if (scoreboardValues.Modifier != ScoreboardValues.RootPath)
+            if (scoreboardValues.File != ScoreboardValues.RootPath)
             {
                 FunctionCompiler.Lines
-                    .FilePath = scoreboardValues.Modifier;
+                    .FilePath = scoreboardValues.File;
                 FunctionCompiler.Lines
                     .Lines
                     .Add(
@@ -118,5 +118,10 @@ namespace MCFBuilder.Utility
         {
             FunctionCompiler.Lines.Lines.Add($"tag {selector} remove {name}");
         }
+    }
+    //TODO implement if
+    public static class If
+    {
+
     }
 }

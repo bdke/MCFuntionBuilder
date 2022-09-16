@@ -41,7 +41,7 @@ namespace MCFBuilder
 
 
         #region Numbers
-        private object? Add(object? left, object? right)
+        public static object? Add(object? left, object? right)
         {
             if (left is int l && right is int r) return l + r;
             if (left is float l2 && right is int r2) return l2 + r2;
@@ -54,7 +54,7 @@ namespace MCFBuilder
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        private object? Subtract(object? left, object? right)
+        public static object? Subtract(object? left, object? right)
         {
             if (left is int l && right is int r) return l - r;
             if (left is float l2 && right is int r2) return l2 - r2;
@@ -64,7 +64,7 @@ namespace MCFBuilder
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        private object? Multiply(object? left, object? right)
+        public static object? Multiply(object? left, object? right)
         {
             if (left is int l && right is int r) return l * r;
             if (left is float l2 && right is int r2) return l2 * r2;
@@ -74,7 +74,7 @@ namespace MCFBuilder
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        private object? Remainder(object? left, object? right)
+        public static object? Remainder(object? left, object? right)
         {
             if (left is int l && right is int r) return l % r;
             if (left is float l2 && right is int r2) return l2 % r2;
@@ -84,7 +84,7 @@ namespace MCFBuilder
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        private object? Divide(object? left, object? right)
+        public static object? Divide(object? left, object? right)
         {
             if (left is int l && right is int r) return l / r;
             if (left is float l2 && right is int r2) return l2 / r2;

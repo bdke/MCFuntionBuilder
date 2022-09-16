@@ -1,9 +1,11 @@
 grammar MCFBuilder;
+
+
 program: line* EOF;
 
 line: assignFunction | statement | ifBlock | whileBlock | forBlock | assignFile | COMMENT;
 
-statement: (assignment | functionCall | return) SEMI;
+statement: (assignment | functionCall | return | global) SEMI;
 
 ifBlock: 'if' '(' expression ')' block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
@@ -18,10 +20,32 @@ assignFunction: 'def' IDENTIFIER '(' IDENTIFIER? (',' IDENTIFIER)* ')' block ;
 assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
 
 
-assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) 
-            | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression) 
-            | ((VARIABLES_TYPE)? IDENTIFIER selector assignOp expression);
-selector: ('@' ('s'|'a'|'r'|'e'|'p') | IDENTIFIER)? ('[' IDENTIFIER? ']')?;
+// assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) 
+//             | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression) 
+//             | ((VARIABLES_TYPE)? IDENTIFIER selector assignOp expression);
+
+assignment: tagsOperation || localScoresAssignment || scoresOperation || scoresEqual || localTagsAssignment ||  generalAssignment ;
+
+generalAssignment: localAssignment || operation;
+
+localTagsAssignment: 'tag' 'var' IDENTIFIER selector '=' BOOL ;
+localAssignment: 'var' IDENTIFIER ('=' expression)? ;
+localScoresAssignment: 'score' 'var' IDENTIFIER selector ('=' expression)?;
+
+global: globalAssignment || globalScoresAssignment || globalTagsAssignment ;
+
+globalTagsAssignment: 'tag' 'global' IDENTIFIER selector '=' BOOL ;
+globalAssignment: 'global' IDENTIFIER ('=' expression)? ;
+globalScoresAssignment: 'score' 'global' IDENTIFIER selector ('=' expression)?;
+
+operation: IDENTIFIER assignOp expression ;
+scoresOperation: 'score' IDENTIFIER selector assignOp expression ;
+tagsOperation: 'tag' IDENTIFIER selector '=' BOOL ;
+
+scoresEqual: IDENTIFIER selector assignOp IDENTIFIER selector ;
+
+
+selector: SELECTOR || STRING || IDENTIFIER;
 
 VARIABLES_TYPE: ('var' | 'global') ;
 
@@ -65,7 +89,9 @@ NULL: 'null';
 
 block: '{' line* '}';
 
-COMMENT: '//' ~[\r\n]* -> skip ;
+SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
+COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 SEMI: ';';
+

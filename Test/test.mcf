@@ -1,13 +1,26 @@
 #sad:
-var john:dummy @s = 3;
+// var john:dummy @s = 3;
 
-global amogus:dummy @a = 2;
+//global amogus:dummy @a = 2;
 
-var sa:dummy @a = 2; 
-sa:dummy @a += john @s;
+// var sa:dummy @a = 2; 
+// sa:dummy @a += john @s;
+// Write(sa);
+var sa = 3;
 Write(sa);
 
-global anmo @s = true;
+var sele = "@e";
+Write(sele);
 
-#amogus:
-anmo @s = false;
+score global ghiasfvyhi @a = 3;
+
+tag var sad @s = false;
+tag sad @s = true;
+
+score var amogus sele = 4;
+score var th @s = 5;
+score var testsb @a = "dummy";
+th @s += amogus @e;
+Write(th);
+
+//global anmo @s = true;

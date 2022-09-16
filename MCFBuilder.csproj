@@ -4,7 +4,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>MCFBuilder</RootNamespace>
     <Nullable>enable</Nullable>
-    <WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Test\native.cs" />

@@ -13,15 +13,17 @@ namespace MCFBuilder.Type
             "dummy" 
         };
         public ScoreboardTypes ScoreboardType { get; set; }
-        public int? Value { get; set; }
+        public Dictionary<string, int?> Value { get; set; }
         public string Name { get; set; }
-        public string? Modifier { get; set; }
-        public ScoreboardValues(ScoreboardTypes scoreboardType, int? value, string name, string? modifier)
+        public string? File { get; set; }
+        public bool IsModify { get; set; }
+        public ScoreboardValues(ScoreboardTypes scoreboardType, Dictionary<string, int?> value, string name, string? file, bool isModify)
         {
             ScoreboardType = scoreboardType;
             Value = value;
             Name = name;
-            Modifier = modifier;
+            File = file;
+            IsModify = isModify;
         }
 
         public static ScoreboardTypes GetScoreboardTypes(string type)

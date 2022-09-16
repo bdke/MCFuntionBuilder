@@ -25,14 +25,14 @@ namespace MCFBuilder
             ScriptVisitor visitor = new ScriptVisitor();
             visitor.Visit(context);
             visitor.RemoveScoreboards();
-            var scoreboardString = from i in ProgramVariables.ScoreboardObjects select $"scoreboard objectives add " +
-                                   $"{i.ScoreboardValues.Name} " +
-                                   $"{ScoreboardValues.GetScoreboardTypes(i.ScoreboardValues.ScoreboardType)}";
-            var scoreboardInitValues = from i in ProgramVariables.ScoreboardObjects select $"scoreboard players set " +
-                                       $"{ProgramVariables.ScoreboardInitValues[i]} " +
-                                       $"{i.ScoreboardValues.Name} " +
-                                       $"{i.ScoreboardValues.Value}";
-            File.WriteAllText("load.mcfunction", String.Join('\n',scoreboardString.Concat(scoreboardInitValues)));
+            //var scoreboardString = from i in ProgramVariables.ScoreboardObjects select $"scoreboard objectives add " +
+            //                       $"{i.ScoreboardValues.Name} " +
+            //                       $"{ScoreboardValues.GetScoreboardTypes(i.ScoreboardValues.ScoreboardType)}";
+            //var scoreboardInitValues = from i in ProgramVariables.ScoreboardObjects select $"scoreboard players set " +
+            //                           $"{ProgramVariables.ScoreboardInitValues[i]} " +
+            //                           $"{i.ScoreboardValues.Name} " +
+            //                           $"{i.ScoreboardValues.Value}";
+            //File.WriteAllText("load.mcfunction", String.Join('\n',scoreboardString.Concat(scoreboardInitValues)));
         }
 
         public static void Main(string[] args)

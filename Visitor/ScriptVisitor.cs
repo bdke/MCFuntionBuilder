@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MCFBuilder.Utility;
 using MCFBuilder.Type;
+using Antlr4.Runtime.Tree;
 
 namespace MCFBuilder
 {
@@ -20,6 +21,8 @@ namespace MCFBuilder
         List<Scoreboard> scoreboards = new();
         List<string>? tempOperators = null;
         List<TagsType> tags = new();
+
+        bool Init = false;
         string[] BuiltInFunctions { get; } =
         {
             "Write","LoadFile"
@@ -212,6 +215,60 @@ namespace MCFBuilder
                 Visit(context.elseIfBlock());
             }
             return null;
+        }
+
+        public override object? VisitSelector(MCFBuilderParser.SelectorContext context)
+        {
+            if (context.SELECTOR() != null)
+                return context.SELECTOR().GetText();
+            else if ((context.STRING() != null))
+                return context.STRING().GetText()[1..^1];
+            else if (context.IDENTIFIER() != null)
+            {
+                var varName = context.IDENTIFIER().GetText();
+
+                if (Variables.ContainsKey(varName))
+                {
+                    if (Variables[varName] is string)
+                        return Variables[varName];
+                    else
+                        throw new InvalidOperationException($"'{varName}' must be a string");
+                }
+                else if (ProgramVariables.globalVariables.ContainsKey(varName))
+                {
+                    if (ProgramVariables.globalVariables[varName] is string)
+                        return ProgramVariables.globalVariables[varName];
+                    else
+                        throw new InvalidOperationException($"'{varName}' must be a string");
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+                throw new NotImplementedException();
+        }
+
+        public override object? VisitProgram([NotNull] MCFBuilderParser.ProgramContext context)
+        {
+            Init = true;
+            currentFile = "load";
+            var lines = context.line();
+
+            FunctionCompiler.Lines = new();
+            FunctionCompiler.Lines.Lines = new();
+            FunctionCompiler.Lines.FilePath = currentFile;
+
+            foreach (var line in lines)
+            {
+                if (line.ToStringTree().Contains("global"))
+                {
+                    Visit(line);
+                }
+            }
+            Init = false;
+            return base.VisitProgram(context);
         }
     }
 }
