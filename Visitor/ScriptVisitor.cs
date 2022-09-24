@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using MCFBuilder.Utility;
 using MCFBuilder.Type;
 using Antlr4.Runtime.Tree;
+using MCFBuilder.Visitor.BuiltInFuntions;
+using System.Reflection;
 
 namespace MCFBuilder
 {
@@ -23,45 +25,23 @@ namespace MCFBuilder
         List<TagsType> tags = new();
 
         bool Init = false;
-        string[] BuiltInFunctions { get; } =
-        {
-            "Write","LoadFile"
-        };
+        string[] BuiltInFunctions { get; } = 
+            (from i in typeof(ProgramFunction).GetMethods(BindingFlags.Public | BindingFlags.Static) select i.Name)
+            .ToArray();
 
         public ScriptVisitor()
         {
             InitFunctions();
         }
 
-        private object? Write(object?[] args)
-        {
-            foreach (var arg in args)
-            {
-                Console.WriteLine(arg);
-            }
-
-            return null;
-        }
-
-        private async Task<object?> LoadFile(object?[] arg)
-        {
-            string? result = null;
-            if (arg != null)
-            {
-#pragma warning disable CS8602 // 可能有 Null 參考引數。
-#pragma warning disable CS8604 // 可能有 Null 參考引數。
-                result = File.ReadAllText(arg[0].ToString());
-#pragma warning restore CS8604 // 可能有 Null 參考引數。
-#pragma warning restore CS8602 // 可能有 Null 參考引數。
-                Console.WriteLine(await CSharpScript.EvaluateAsync(result));
-            }
-            return result;
-        }
-
         private void InitFunctions()
         {
-            Variables["Write"] = new Func<object?[], object?>(Write);
-            Variables["LoadFile"] = new Func<object?[], object?>(LoadFile);
+            //Variables["Write"] = new Func<object?[], object?>(Write);
+            //Variables["LoadFile"] = new Func<object?[], object?>(LoadFile);
+            foreach (string function in BuiltInFunctions)
+            {
+                Variables[function] = (object?[] s) => typeof(ProgramFunction).GetMethod(function).Invoke(typeof(ProgramFunction), s);
+            }
         }
 
         public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
@@ -205,17 +185,43 @@ namespace MCFBuilder
         public override object? VisitIfBlock(MCFBuilderParser.IfBlockContext context)
         {
             var exp = context.expression();
+            var type = context.IFTYPES().GetText();
 
-            if (IsTrue(Visit(exp)))
+            int? currentNum = null;
+
+            CommandAttribute.IsContainElse = false;
+            if (Visit(exp) is string s)
             {
+                currentNum = IfConditionHandler.Add(s, type);
                 Visit(context.block());
             }
+            else
+            {
+                //if (IsTrue(Visit(exp)))
+                //{
+                //    Visit(context.block());
+                //}
+                //if (context.elseIfBlock() != null)
+                //{
+                //    Visit(context.elseIfBlock());
+                //}
+
+            }
+
+
             if (context.elseIfBlock() != null)
             {
+                CommandAttribute.IsContainElse = true;
                 Visit(context.elseIfBlock());
             }
+            
+
+            IfConditionHandler.Remove(currentNum);
+
             return null;
         }
+
+
 
         public override object? VisitSelector(MCFBuilderParser.SelectorContext context)
         {

@@ -26,7 +26,7 @@ namespace MCFBuilder
         public override object? VisitLocalScoresAssignment(MCFBuilderParser.LocalScoresAssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            var selector = (string?)Visit(context.selector());
+            var selector = (context.selector() != null) ? (string?)Visit(context.selector()) : "";
             object? value = null;
             if (context.expression() != null)
             {
@@ -83,10 +83,15 @@ namespace MCFBuilder
         public override object? VisitOperation(MCFBuilderParser.OperationContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            var assignOp = context.expression().GetText();
+            var assignOp = context.assignOp().GetText();
+            var selector = context.selector();
+            var exp = context.expression();
             if (!CheckExists(varName))
                 throw new InvalidOperationException($"'{varName}' is not existed");
 
+
+
+            //normal variables
             if (Variables.ContainsKey(varName))
             {
                 Variables[varName] = AssignmentHelper.AssignOp(assignOp,(int?)Visit(context.IDENTIFIER()),(int?)Visit(context.expression()));
@@ -95,6 +100,84 @@ namespace MCFBuilder
             {
                 ProgramVariables.globalVariables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)Visit(context.IDENTIFIER()), (int?)Visit(context.expression()));
             }
+
+            //tags variables
+            else if (tags.Where(v => v.Name == varName).Any() && selector != null)
+            {
+                var value = Visit(exp);
+                if (value is bool b)
+                {
+                    tags.Where(v => v.Name == varName).ToList().First().Value[(string?)Visit(selector)] = b;
+
+                    if (b)
+                        Tags.Add(varName, (string?)Visit(selector));
+                    else
+                        Tags.Remove(varName, (string?)Visit(selector));
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            else if (ProgramVariables.Tags.Where(v => v.Name == varName).Any() && selector != null)
+            {
+                var value = Visit(exp);
+                if (value is bool b)
+                {
+                    ProgramVariables.Tags.Where(v => v.Name == varName).ToList().First().Value[(string?)Visit(selector)] = b;
+
+                    if (b)
+                        Tags.Add(varName, (string?)Visit(selector));
+                    else
+                        Tags.Remove(varName, (string?)Visit(selector));
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+
+            //scores variables
+            else if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Any() && selector != null)
+            {
+                var scoreboard = scoreboards.Where(v => v.ScoreboardValues.Name == varName).First();
+                var sel = (string?)Visit(selector);
+
+                if (!scoreboard.ScoreboardValues.Value.ContainsKey(sel))
+                    scoreboard.ScoreboardValues.Value[sel] = (int?)Visit(exp);
+
+                if (!scoreboard.ScoreboardValues.IsModify)
+                    throw new InvalidOperationException($"'{varName}' can not be modified");
+                var value = AssignmentHelper.ScoreAssignOp(
+                                                            assignOp,
+                                                            scoreboard.ScoreboardValues.Value[sel],
+                                                            (int?)Visit(exp),
+                                                            scoreboard,
+                                                            (string?)Visit(selector)
+                                                          );
+                scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First().ScoreboardValues.Value[(string?)Visit(selector)] = value;
+            }
+
+            else if (ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == varName).Any() && selector != null)
+            {
+                var scoreboard = ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == varName).First();
+                var sel = (string?)Visit(selector);
+
+                if (!scoreboard.ScoreboardValues.Value.ContainsKey(sel))
+                    scoreboard.ScoreboardValues.Value[sel] = (int?)Visit(exp);
+
+                if (!scoreboard.ScoreboardValues.IsModify)
+                    throw new InvalidOperationException($"'{varName}' can not be modified");
+                var value = AssignmentHelper.ScoreAssignOp(
+                                                            assignOp,
+                                                            scoreboard.ScoreboardValues.Value[(string?)Visit(selector)],
+                                                            (int?)Visit(exp),
+                                                            scoreboard,
+                                                            (string?)Visit(selector)
+                                                          );
+                scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First().ScoreboardValues.Value[(string?)Visit(selector)] = value;
+            }
+
             else
             {
                 throw new NotImplementedException();
@@ -102,30 +185,30 @@ namespace MCFBuilder
             return null;
         }
 
-        public override object? VisitScoresOperation(MCFBuilderParser.ScoresOperationContext context)
-        {
-            var varName = context.IDENTIFIER().GetText();
-            var assignOp = context.assignOp().GetText();
-            var selector = (string?)Visit(context.selector());
-            var expValue = Visit(context.expression());
+        //public override object? VisitScoresOperation(MCFBuilderParser.ScoresOperationContext context)
+        //{
+        //    var varName = context.IDENTIFIER().GetText();
+        //    var assignOp = context.assignOp().GetText();
+        //    var selector = (string?)Visit(context.selector());
+        //    var expValue = Visit(context.expression());
 
-            if (!CheckExists(varName))
-                throw new InvalidOperationException($"'{varName}' is not existed");
+        //    if (!CheckExists(varName))
+        //        throw new InvalidOperationException($"'{varName}' is not existed");
 
-            var scoreboard = scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First();
-            if (!scoreboard.ScoreboardValues.IsModify)
-                throw new InvalidOperationException($"'{varName}' can not be modified");
-            var value = AssignmentHelper.ScoreAssignOp(
-                                                        assignOp, 
-                                                        scoreboard.ScoreboardValues.Value[selector],
-                                                        ((int?)expValue),
-                                                        scoreboard, 
-                                                        selector
-                                                      );
-            scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First().ScoreboardValues.Value[selector] = value;
+        //    var scoreboard = scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First();
+        //    if (!scoreboard.ScoreboardValues.IsModify)
+        //        throw new InvalidOperationException($"'{varName}' can not be modified");
+        //    var value = AssignmentHelper.ScoreAssignOp(
+        //                                                assignOp, 
+        //                                                scoreboard.ScoreboardValues.Value[selector],
+        //                                                ((int?)expValue),
+        //                                                scoreboard, 
+        //                                                selector
+        //                                              );
+        //    scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().First().ScoreboardValues.Value[selector] = value;
 
-            return null;
-        }
+        //    return null;
+        //}
 
         public override object? VisitScoresEqual(MCFBuilderParser.ScoresEqualContext context)
         {
@@ -137,9 +220,7 @@ namespace MCFBuilder
             var selector = (string?)Visit(context.selector(0));
             var selector2 = (string?)Visit(context.selector(1));
 
-            if (!CheckExists(varName))
-                throw new InvalidOperationException($"'{varName}' is not existed");
-            else if (!CheckExists(targetName))
+            if (!CheckExists(varName) || !CheckExists(targetName))
                 throw new InvalidOperationException($"'{varName}' is not existed");
 
             var scoreboard = scoreboards.Where(v => v.ScoreboardValues.Name == varName).ToList().FirstOrDefault();
@@ -201,39 +282,39 @@ namespace MCFBuilder
             return null;
         }
 
-        public override object? VisitTagsOperation(MCFBuilderParser.TagsOperationContext context)
-        {
-            var selector = (string?)Visit(context.selector());
-            var varName = context.IDENTIFIER().GetText();
-            var boolean = bool.Parse(context.BOOL().GetText());
+        //public override object? VisitTagsOperation(MCFBuilderParser.TagsOperationContext context)
+        //{
+        //    var selector = (string?)Visit(context.selector());
+        //    var varName = context.IDENTIFIER().GetText();
+        //    var boolean = bool.Parse(context.BOOL().GetText());
 
-            var localTags = tags.Where(v => v.Name == varName).ToList();
-            var globalTags = ProgramVariables.Tags.Where(v => v.Name == varName).ToList();
+        //    var localTags = tags.Where(v => v.Name == varName).ToList();
+        //    var globalTags = ProgramVariables.Tags.Where(v => v.Name == varName).ToList();
 
-            if (localTags.Any())
-            {
-                tags.Where(v => v.Name == varName).ToList().First().Value[selector] = boolean ;
+        //    if (localTags.Any())
+        //    {
+        //        tags.Where(v => v.Name == varName).ToList().First().Value[selector] = boolean ;
 
-                if (boolean)
-                    Tags.Add(varName, selector);
-                else
-                    Tags.Remove(varName, selector);
-            }
-            else if (globalTags.Any())
-            {
-                ProgramVariables.Tags.Where(v => v.Name == varName).ToList().First().Value[selector] = boolean ;
-                if (boolean)
-                    Tags.Add(varName, selector);
-                else
-                    Tags.Remove(varName, selector);
-            }
-            else
-            {
-                throw new InvalidOperationException($"'{varName}' is not existed");
-            }
+        //        if (boolean)
+        //            Tags.Add(varName, selector);
+        //        else
+        //            Tags.Remove(varName, selector);
+        //    }
+        //    else if (globalTags.Any())
+        //    {
+        //        ProgramVariables.Tags.Where(v => v.Name == varName).ToList().First().Value[selector] = boolean ;
+        //        if (boolean)
+        //            Tags.Add(varName, selector);
+        //        else
+        //            Tags.Remove(varName, selector);
+        //    }
+        //    else
+        //    {
+        //        throw new InvalidOperationException($"'{varName}' is not existed");
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         private bool CheckExists(string name)
         {
@@ -242,6 +323,8 @@ namespace MCFBuilder
                 || scoreboards.Where(v => v.ScoreboardValues.Name == name).Any() 
                 || ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == name).Any()
                 || ProgramVariables.globalVariables.ContainsKey(name)
+                || tags.Where(v => v.Name == name).Any()
+                || ProgramVariables.Tags.Where(v => v.Name == name).Any()
                 )
                 return true;
             else return false;

@@ -1,26 +1,29 @@
 #sad:
-// var john:dummy @s = 3;
+var sa = 4;
+tag var sad @a = true;
+sad @s = false;
 
-//global amogus:dummy @a = 2;
+score var test @a = 3;
+test @a = 4;
+score var amogus;
 
-// var sa:dummy @a = 2; 
-// sa:dummy @a += john @s;
-// Write(sa);
-var sa = 3;
-Write(sa);
+if entity ("@s[tag=sad]") {
+    test @s = 5;
+}
+else if entity ("@r[tag=amogus]") {
+    test @r = 2;
+}
+else {
+    test @s = 69;
+}
 
-var sele = "@e";
-Write(sele);
+Write("Amogus","sad");
 
-score global ghiasfvyhi @a = 3;
-
-tag var sad @s = false;
-tag sad @s = true;
-
-score var amogus sele = 4;
-score var th @s = 5;
-score var testsb @a = "dummy";
-th @s += amogus @e;
-Write(th);
-
-//global anmo @s = true;
+execute as @s at @s {
+    if entity ("@r[tag=sussy]") {
+        test @s = 420;
+    }
+    
+    test @s = 3;
+    
+}

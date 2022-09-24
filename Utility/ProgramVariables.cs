@@ -11,7 +11,6 @@ namespace MCFBuilder.Utility
     {
         public static Dictionary<string, object?> globalVariables { get; } = new();
         public static List<Scoreboard> ScoreboardObjects { get; } = new();
-        public static Dictionary<Scoreboard, string?> ScoreboardInitValues { get; } = new();
         public static List<TagsType> Tags { get; } = new();
     }
 }

@@ -3,11 +3,19 @@ grammar MCFBuilder;
 
 program: line* EOF;
 
-line: assignFunction | statement | ifBlock | whileBlock | forBlock | assignFile | COMMENT;
+line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBlock | assignFile | COMMENT;
 
 statement: (assignment | functionCall | return | global) SEMI;
 
-ifBlock: 'if' '(' expression ')' block ('else' elseIfBlock)?;
+ifBlock: 'if' IFTYPES '(' expression ')' block ('else' elseIfBlock)?;
+executeBlock: 'execute' (executeTypes)+ block ;
+executeTypes
+            : ('as' selector) #ExecuteAsExpression
+            | ('at' selector) #ExecuteAtExpression
+            | ('positioned' (('as' selector) | (vector))) #ExeuctePositionedExpression
+            ;
+vector: '~' number? '~' number? '~' number? ;
+
 elseIfBlock: block | ifBlock;
 
 whileBlock: WHILE '(' expression ')' block; 
@@ -24,23 +32,23 @@ assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
 //             | ((VARIABLES_TYPE)? IDENTIFIER assignOp expression) 
 //             | ((VARIABLES_TYPE)? IDENTIFIER selector assignOp expression);
 
-assignment: tagsOperation || localScoresAssignment || scoresOperation || scoresEqual || localTagsAssignment ||  generalAssignment ;
+assignment: localScoresAssignment || scoresEqual || localTagsAssignment ||  generalAssignment ;
 
 generalAssignment: localAssignment || operation;
 
 localTagsAssignment: 'tag' 'var' IDENTIFIER selector '=' BOOL ;
 localAssignment: 'var' IDENTIFIER ('=' expression)? ;
-localScoresAssignment: 'score' 'var' IDENTIFIER selector ('=' expression)?;
+localScoresAssignment: 'score' 'var' IDENTIFIER (selector '=' expression)?;
 
 global: globalAssignment || globalScoresAssignment || globalTagsAssignment ;
 
 globalTagsAssignment: 'tag' 'global' IDENTIFIER selector '=' BOOL ;
 globalAssignment: 'global' IDENTIFIER ('=' expression)? ;
-globalScoresAssignment: 'score' 'global' IDENTIFIER selector ('=' expression)?;
+globalScoresAssignment: 'score' 'global' IDENTIFIER (selector '=' expression)?;
 
-operation: IDENTIFIER assignOp expression ;
-scoresOperation: 'score' IDENTIFIER selector assignOp expression ;
-tagsOperation: 'tag' IDENTIFIER selector '=' BOOL ;
+operation: IDENTIFIER selector? assignOp expression ;
+// scoresOperation: 'score' IDENTIFIER selector assignOp expression ;
+// tagsOperation: 'tag' IDENTIFIER selector '=' BOOL ;
 
 scoresEqual: IDENTIFIER selector assignOp IDENTIFIER selector ;
 
@@ -63,6 +71,7 @@ expression
     | expression addOp expression   #additiveExpression
     | expression compareOp expression #comparisionExpression
     | expression boolOp expression #booleanExpression
+    | expression '.' expression #staticFunctionExpression
 ;
 
 //operator
@@ -81,6 +90,7 @@ list: '[' constant? (',' constant)* ']' ;
 dict: '{' (STRING ':' constant)? (',' STRING ':' constant)* '}' ;
 constant: INTEGER | FLOAT | STRING | BOOL | dict | list | NULL;
 
+number: INTEGER | FLOAT ;
 INTEGER: [0-9]+;
 FLOAT: [0-9]+ '.' [0-9]+;
 STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
@@ -89,6 +99,7 @@ NULL: 'null';
 
 block: '{' line* '}';
 
+IFTYPES: 'entity' ;
 SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
 COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;

@@ -7,6 +7,7 @@ using MCFBuilder.Type;
 
 namespace MCFBuilder.Utility
 {
+    
     public struct ProgramLines
     {
         public string? FilePath { get; set; }
@@ -32,7 +33,7 @@ namespace MCFBuilder.Utility
                 FunctionCompiler.Lines
                     .Lines
                     .Add(
-                        new($"scoreboard objectives add " +
+                        new($"{CommandAttribute.Compile()}scoreboard objectives add " +
                         $"{scoreboardValues.Name} " +
                         $"{ScoreboardValues.GetScoreboardTypes(ScoreboardValues.ScoreboardType)}")
                     );
@@ -41,64 +42,64 @@ namespace MCFBuilder.Utility
 
         public void Add(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players add {selector} {ScoreboardValues.Name} {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players add {selector} {ScoreboardValues.Name} {value}");
         }
 
         public void Add(string? name, string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} += {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} += {selector2} {name}");
         }
 
         public void Subtract(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players remove {selector} {ScoreboardValues.Name} {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players remove {selector} {ScoreboardValues.Name} {value}");
         }
         public void Subtract(string? name, string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} -= {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} -= {selector2} {name}");
         }
 
         public void Multiply(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} *= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} *= .number _");
         }
 
         public void Multiply(string? name, string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} *= {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} *= {selector2} {name}");
         }
 
         public void Divide(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} /= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} /= .number _");
         }
 
         public void Divide(string? name, string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} /= {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} /= {selector2} {name}");
         }
 
         public void Remainder(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} %= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} %= .number _");
         }
 
         public void Remainder(string? name, string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} %= {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} %= {selector2} {name}");
         }
 
         public void Set(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players set {selector} {ScoreboardValues.Name} {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set {selector} {ScoreboardValues.Name} {value}");
         }
 
         public void Set(string? name ,string? selector, string? selector2)
         {
-            FunctionCompiler.Lines.Lines.Add($"scoreboard players operation {selector} {ScoreboardValues.Name} = {selector2} {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} = {selector2} {name}");
         }
 
         //public void EqualID(object? value, string? selector, string? selector2)
@@ -111,17 +112,12 @@ namespace MCFBuilder.Utility
     {
         public static void Add(string? name, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"tag {selector} add {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}tag {selector} add {name}");
         }
 
         public static void Remove(string? name, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"tag {selector} remove {name}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}tag {selector} remove {name}");
         }
-    }
-    //TODO implement if
-    public static class If
-    {
-
     }
 }
