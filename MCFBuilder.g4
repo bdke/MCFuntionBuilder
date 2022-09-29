@@ -3,7 +3,7 @@ grammar MCFBuilder;
 
 program: line* EOF;
 
-line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBlock | assignFile | COMMENT;
+line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBlock | assignFile | COMMENT | COMMAND;
 
 statement: (assignment | functionCall | return | global) SEMI;
 
@@ -71,7 +71,8 @@ expression
     | expression addOp expression   #additiveExpression
     | expression compareOp expression #comparisionExpression
     | expression boolOp expression #booleanExpression
-    | expression '.' expression #staticFunctionExpression
+    | expression '.' expression #classFunctionExpression
+    | 'new' expression #createClassExpression
 ;
 
 //operator
@@ -102,6 +103,7 @@ block: '{' line* '}';
 IFTYPES: 'entity' ;
 SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
 COMMENT: '//' ~[\r\n]* -> skip;
+COMMAND: '/' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 SEMI: ';';

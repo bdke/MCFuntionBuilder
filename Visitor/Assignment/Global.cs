@@ -19,9 +19,9 @@ namespace MCFBuilder
                 if (CheckExists(varName))
                     throw new InvalidOperationException($"'{varName}' is already existed");
                 if (context.GetText().Contains('='))
-                    ProgramVariables.globalVariables[varName] = Visit(context.expression());
+                    ProgramVariables.GlobalVariables[varName] = Visit(context.expression());
                 else
-                    ProgramVariables.globalVariables[varName] = null;
+                    ProgramVariables.GlobalVariables[varName] = null;
             }
             return null;
         }
@@ -95,7 +95,7 @@ namespace MCFBuilder
                 var varName = context.IDENTIFIER().GetText();
                 var boolean = bool.Parse(context.BOOL().GetText());
 
-                ProgramVariables.Tags.Add(new() { Name = varName, Selector = selector, Value = new() { [selector] = boolean } });
+                ProgramVariables.Tags.Add(new() { Name = varName, Selector = new(selector), Value = new() { [selector] = boolean } });
 
                 if (boolean)
                 {

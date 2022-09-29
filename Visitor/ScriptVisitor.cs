@@ -11,6 +11,7 @@ using MCFBuilder.Type;
 using Antlr4.Runtime.Tree;
 using MCFBuilder.Visitor.BuiltInFuntions;
 using System.Reflection;
+using MCFBuilder.Type.Compiler;
 
 namespace MCFBuilder
 {
@@ -25,23 +26,10 @@ namespace MCFBuilder
         List<TagsType> tags = new();
 
         bool Init = false;
-        string[] BuiltInFunctions { get; } = 
-            (from i in typeof(ProgramFunction).GetMethods(BindingFlags.Public | BindingFlags.Static) select i.Name)
-            .ToArray();
 
         public ScriptVisitor()
         {
-            InitFunctions();
-        }
 
-        private void InitFunctions()
-        {
-            //Variables["Write"] = new Func<object?[], object?>(Write);
-            //Variables["LoadFile"] = new Func<object?[], object?>(LoadFile);
-            foreach (string function in BuiltInFunctions)
-            {
-                Variables[function] = (object?[] s) => typeof(ProgramFunction).GetMethod(function).Invoke(typeof(ProgramFunction), s);
-            }
         }
 
         public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
@@ -55,7 +43,6 @@ namespace MCFBuilder
             tempVariables.Clear();
             functionVariables.Clear();
             scoreboards.Clear();
-            InitFunctions();
             return null;
         }
 
@@ -240,10 +227,10 @@ namespace MCFBuilder
                     else
                         throw new InvalidOperationException($"'{varName}' must be a string");
                 }
-                else if (ProgramVariables.globalVariables.ContainsKey(varName))
+                else if (ProgramVariables.GlobalVariables.ContainsKey(varName))
                 {
-                    if (ProgramVariables.globalVariables[varName] is string)
-                        return ProgramVariables.globalVariables[varName];
+                    if (ProgramVariables.GlobalVariables[varName] is string)
+                        return ProgramVariables.GlobalVariables[varName];
                     else
                         throw new InvalidOperationException($"'{varName}' must be a string");
                 }

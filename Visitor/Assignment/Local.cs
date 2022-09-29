@@ -96,9 +96,9 @@ namespace MCFBuilder
             {
                 Variables[varName] = AssignmentHelper.AssignOp(assignOp,(int?)Visit(context.IDENTIFIER()),(int?)Visit(context.expression()));
             }
-            else if (ProgramVariables.globalVariables.ContainsKey(varName))
+            else if (ProgramVariables.GlobalVariables.ContainsKey(varName))
             {
-                ProgramVariables.globalVariables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)Visit(context.IDENTIFIER()), (int?)Visit(context.expression()));
+                ProgramVariables.GlobalVariables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)Visit(context.IDENTIFIER()), (int?)Visit(context.expression()));
             }
 
             //tags variables
@@ -272,7 +272,7 @@ namespace MCFBuilder
             var varName = context.IDENTIFIER().GetText();
             var boolean = bool.Parse(context.BOOL().GetText());
 
-            tags.Add(new() { Name = varName, Selector = selector, Value = new() { [selector] = boolean } });
+            tags.Add(new() { Name = varName, Selector = new(selector), Value = new() { [selector] = boolean } });
 
             if (boolean)
             {
@@ -322,7 +322,7 @@ namespace MCFBuilder
                 Variables.ContainsKey(name) 
                 || scoreboards.Where(v => v.ScoreboardValues.Name == name).Any() 
                 || ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == name).Any()
-                || ProgramVariables.globalVariables.ContainsKey(name)
+                || ProgramVariables.GlobalVariables.ContainsKey(name)
                 || tags.Where(v => v.Name == name).Any()
                 || ProgramVariables.Tags.Where(v => v.Name == name).Any()
                 )

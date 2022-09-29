@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MCFBuilder.Type;
+using MCFBuilder.Type.Compiler;
 
 namespace MCFBuilder.Utility
 {
-    
+
     public struct ProgramLines
     {
         public string? FilePath { get; set; }

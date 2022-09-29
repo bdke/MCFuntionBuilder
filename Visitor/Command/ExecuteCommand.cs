@@ -1,5 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
-using MCFBuilder.Type;
+using MCFBuilder.Type.Compiler;
 using System;
 using System.Collections.Generic;
 using System.Linq;

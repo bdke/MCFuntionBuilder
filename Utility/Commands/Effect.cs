@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCFBuilder.Type
+namespace MCFBuilder.Utility.Commands
 {
-    public enum ScoreboardTypes
+    public class Effect
     {
-        Dummy
+
     }
 }

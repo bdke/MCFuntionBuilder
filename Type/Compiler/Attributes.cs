@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCFBuilder.Type
+namespace MCFBuilder.Type.Compiler
 {
     public static class CommandAttribute
     {
@@ -36,7 +36,7 @@ namespace MCFBuilder.Type
                 if (attr.AttributeType == AttributeType.IF)
                 {
                     ic++;
-                    for (int i = 0;i < ic - 1;i++)
+                    for (int i = 0; i < ic - 1; i++)
                     {
                         s += "unless " + IfItem[i] + " ";
                     }
@@ -72,7 +72,7 @@ namespace MCFBuilder.Type
 
         public static void Add(MCFBuilderParser.ExpressionContext condition, string type)
         {
-            
+
         }
 
         public static void Remove(int? num)

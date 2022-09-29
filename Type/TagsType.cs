@@ -10,7 +10,7 @@ namespace MCFBuilder.Type
     {
         public string? Name { get; set; }
         public Dictionary<string, bool>? Value { get; set; }
-        public string? Selector { get; set; }
+        public Selector? Selector { get; set; }
         
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using MCFBuilder.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,38 +54,60 @@ namespace MCFBuilder
         public override object? VisitFunctionCall(MCFBuilderParser.FunctionCallContext context)
         {
             var name = context.IDENTIFIER().GetText();
-            var args = context.expression().Select(Visit).ToArray(); 
-            
-            if (!Variables.ContainsKey(name))
-                throw new Exception($"'{name}' is not defined");
+            var args = context.expression().Select(Visit).ToArray();
 
-            if (Variables[name] is not Func<object?[], object?> func)
-                throw new Exception($"Variables {name} is not a function");
-
-            if (!BuiltInFunctions.Contains(name))
+            if (ProgramVariables.GlobalVariables.ContainsKey(name))
             {
-                if (args.Length == 0)
-                {
-                    tempVariables = new Dictionary<string, List<string>>() { [name] = new() };
-                }
-                for (int i = 0; i < args.Length; i++)
-                {
-                    var variables = functionVariables[name];
-                    functionVariables[name][variables.ElementAt(i).Key] = args[i];
-                    tempVariables = new Dictionary<string, List<string>> { [name] = (from v in variables select v.Key).ToList() };
-                }
-            }
+                if (!ProgramVariables.GlobalVariables.ContainsKey(name))
+                    throw new Exception($"'{name}' is not defined");
 
-            return func(args);
+                if (ProgramVariables.GlobalVariables[name] is not Func<object?[], object?> func)
+                    throw new Exception($"Variables {name} is not a function");
+
+                return func(args);
+            }
+            else if (Variables.ContainsKey(name))
+            {
+                if (!Variables.ContainsKey(name))
+                    throw new Exception($"'{name}' is not defined");
+
+                if (Variables[name] is not Func<object?[], object?> func)
+                    throw new Exception($"Variables {name} is not a function");
+
+                if (!ProgramVariables.BuiltInFunctions.Contains(name))
+                {
+                    if (args.Length == 0)
+                    {
+                        tempVariables = new Dictionary<string, List<string>>() { [name] = new() };
+                    }
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        var variables = functionVariables[name];
+                        functionVariables[name][variables.ElementAt(i).Key] = args[i];
+                        tempVariables = new Dictionary<string, List<string>> { [name] = (from v in variables select v.Key).ToList() };
+                    }
+                }
+                return func(args);
+            }
+            else
+            {
+                throw new ArgumentException($"{name} is not existed");
+            }
+            
         }
 
-        public override object? VisitStaticFunctionExpression(MCFBuilderParser.StaticFunctionExpressionContext context)
+        public override object? VisitClassFunctionExpression(MCFBuilderParser.ClassFunctionExpressionContext context)
         {
 
 
             return null;
         }
 
-        
+        public override object? VisitCreateClassExpression(MCFBuilderParser.CreateClassExpressionContext context)
+        {
+
+
+            return null;
+        }
     }
 }

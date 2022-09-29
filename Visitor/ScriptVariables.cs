@@ -112,16 +112,16 @@ namespace MCFBuilder
         //            if (scoreboardNames.Contains(varName))
         //                throw new Exception();
 
-        //            if (ProgramVariables.globalVariables.ContainsKey(varName))
+        //            if (ProgramVariables.GlobalVariables.ContainsKey(varName))
         //            {
-        //                ProgramVariables.globalVariables[varName] = assignOp switch
+        //                ProgramVariables.GlobalVariables[varName] = assignOp switch
         //                {
         //                    "=" => value,
-        //                    "+=" => Add(ProgramVariables.globalVariables[varName], value),
-        //                    "-=" => Subtract(ProgramVariables.globalVariables[varName], value),
-        //                    "*=" => Multiply(ProgramVariables.globalVariables[varName], value),
-        //                    "%=" => Remainder(ProgramVariables.globalVariables[varName], value),
-        //                    "/=" => Divide(ProgramVariables.globalVariables[varName], value),
+        //                    "+=" => Add(ProgramVariables.GlobalVariables[varName], value),
+        //                    "-=" => Subtract(ProgramVariables.GlobalVariables[varName], value),
+        //                    "*=" => Multiply(ProgramVariables.GlobalVariables[varName], value),
+        //                    "%=" => Remainder(ProgramVariables.GlobalVariables[varName], value),
+        //                    "/=" => Divide(ProgramVariables.GlobalVariables[varName], value),
         //                    _ => throw new NotImplementedException(),
         //                };
         //            }
@@ -314,9 +314,9 @@ namespace MCFBuilder
         //            }
         //            else if (modifier == "global")
         //            {
-        //                if (ProgramVariables.globalVariables.ContainsKey(varName))
+        //                if (ProgramVariables.GlobalVariables.ContainsKey(varName))
         //                    throw new Exception();
-        //                ProgramVariables.globalVariables[varName] = value;
+        //                ProgramVariables.GlobalVariables[varName] = value;
         //            }
         //            else
         //            {
@@ -424,9 +424,9 @@ namespace MCFBuilder
         {
             var varName = context.IDENTIFIER().GetText();
 
-            if (ProgramVariables.globalVariables.ContainsKey(varName))
+            if (ProgramVariables.GlobalVariables.ContainsKey(varName))
             {
-                return ProgramVariables.globalVariables[varName];
+                return ProgramVariables.GlobalVariables[varName];
             }
 
             if (scoreboards.Where(v => v.ScoreboardValues.Name == varName).Any())
