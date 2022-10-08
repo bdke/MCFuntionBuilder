@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTempTest", "..\CommonTempTest\CommonTempTest.csproj", "{2C553839-1CDE-4450-96EB-3A18C495E1ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{2711196D-E697-49EB-A3AB-464647D081E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2711196D-E697-49EB-A3AB-464647D081E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2711196D-E697-49EB-A3AB-464647D081E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C553839-1CDE-4450-96EB-3A18C495E1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C553839-1CDE-4450-96EB-3A18C495E1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C553839-1CDE-4450-96EB-3A18C495E1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C553839-1CDE-4450-96EB-3A18C495E1ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

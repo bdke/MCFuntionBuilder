@@ -57,6 +57,10 @@ selector: SELECTOR || STRING || IDENTIFIER;
 
 VARIABLES_TYPE: ('var' | 'global') ;
 
+
+createClass: 'new' IDENTIFIER '(' (expression (',' expression)*)? ')' ;
+classVariables: IDENTIFIER '.' IDENTIFIER ;
+classFunctions: IDENTIFIER '.' IDENTIFIER '(' (expression (',' expression)*)? ')'  ;
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')'; 
 
 return: 'return' expression;
@@ -64,6 +68,9 @@ return: 'return' expression;
 expression
     : constant  #constantExpression
     | IDENTIFIER #identifierExpression
+    | createClass #createClassExpression
+    | classVariables #classVariablesExpression
+    | classFunctions #classFunctionsExpression
     | functionCall #functionCallExpression
     | '(' expression ')' #parenthesizedExpression
     | '!' expression    #notExpression
@@ -71,8 +78,7 @@ expression
     | expression addOp expression   #additiveExpression
     | expression compareOp expression #comparisionExpression
     | expression boolOp expression #booleanExpression
-    | expression '.' expression #classFunctionExpression
-    | 'new' expression #createClassExpression
+    
 ;
 
 //operator

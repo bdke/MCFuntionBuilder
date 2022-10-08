@@ -14,6 +14,7 @@ namespace MCFBuilder
         {
             Console.WriteLine(msg);
             Console.WriteLine($"at {recognizer}{offendingSymbol} ({line}:{charPositionInLine})");
+            //throw new Exception();
         }
     }
 }

@@ -1,29 +1,3 @@
 #sad:
-var sa = 4;
-tag var sad @a = true;
-sad @s = false;
-
-score var test @a = 3;
-test @a = 4;
-score var amogus;
-
-if entity ("@s[tag=sad]") {
-    test @s = 5;
-}
-else if entity ("@r[tag=amogus]") {
-    test @r = 2;
-}
-else {
-    test @s = 69;
-}
-
-Write("Amogus","sad");
-
-execute as @s at @s {
-    if entity ("@r[tag=sussy]") {
-        test @s = 420;
-    }
-    
-    test @s = 3;
-    
-}
+var sel = new Selector();
+Write(sel.Value);

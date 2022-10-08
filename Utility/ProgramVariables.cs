@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using MCFBuilder.Utility.BuiltIn;
+using Selector = MCFBuilder.Utility.BuiltIn.Selector;
 
 namespace MCFBuilder.Utility
 {
@@ -16,11 +18,10 @@ namespace MCFBuilder.Utility
             (from i in typeof(ProgramFunction).GetMethods(BindingFlags.Public | BindingFlags.Static) select i.Name)
             .ToArray();
 
-        public static System.Type[] BuiltInClasses { get; } = Assembly.GetExecutingAssembly()
-                .GetTypes()
-                .Where(t => string.Equals(t.Namespace, "MCFBuilder.Type", StringComparison.Ordinal))
-                .Where(t => t.IsPublic == true)
-                .ToArray();
+        public static Dictionary<string, BuiltInClass> BuiltInClasses { get; } = new()
+        {
+            [nameof(Selector)] = new Selector()
+        };
 
         public static Dictionary<string, object?> GlobalVariables { get; } = VariablesInit();
         public static List<Scoreboard> ScoreboardObjects { get; } = new();

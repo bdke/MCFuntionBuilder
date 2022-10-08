@@ -440,6 +440,10 @@ namespace MCFBuilder
                 return ProgramVariables.ScoreboardObjects.Where(v => v.ScoreboardValues.Name == varName).ElementAt(0).ScoreboardValues.Value;
             }
 
+
+
+
+
             if (!Variables.ContainsKey(varName))
             {
                 foreach (string key in tempVariables.Keys)

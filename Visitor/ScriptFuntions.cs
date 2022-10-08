@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using MCFBuilder.Type;
+using MCFBuilder.Utility.BuiltIn;
 
 namespace MCFBuilder
 {
@@ -96,18 +99,49 @@ namespace MCFBuilder
             
         }
 
-        public override object? VisitClassFunctionExpression(MCFBuilderParser.ClassFunctionExpressionContext context)
-        {
+        //public override object? VisitClassFunctionExpression(MCFBuilderParser.ClassFunctionExpressionContext context)
+        //{
+        //    Console.WriteLine(context.GetText());
 
+        //    return null;
+        //}
+
+        //TODO:
+        public override object? VisitCreateClassExpression(MCFBuilderParser.CreateClassExpressionContext context)
+        {
+            var className = context.createClass().IDENTIFIER().GetText();
+            if (ProgramVariables.BuiltInClasses.Where(v => v.Key == className).Any())
+                return ProgramVariables.BuiltInClasses.Where(v => v.Key == className).FirstOrDefault().Value;
+
+            throw new NotImplementedException();
+        }
+
+        public override object? VisitClassVariablesExpression(MCFBuilderParser.ClassVariablesExpressionContext context)
+        {
+            var _class = (BuiltInClass?)Visit(context.classVariables());
+            var name = context.classVariables().IDENTIFIER(1).GetText();
+
+            if (_class != null)
+            {
+                return _class.GetValue(name);
+            }
 
             return null;
         }
 
-        public override object? VisitCreateClassExpression(MCFBuilderParser.CreateClassExpressionContext context)
+        public override object? VisitClassVariables(MCFBuilderParser.ClassVariablesContext context)
         {
-
+            if (Variables.ContainsKey(context.IDENTIFIER()[0].GetText()))
+            {
+                return Variables[context.IDENTIFIER()[0].GetText()];
+            }
 
             return null;
+        }
+
+        public override object? VisitClassFunctionsExpression(MCFBuilderParser.ClassFunctionsExpressionContext context)
+        {
+            return "amogus";
         }
     }
 }
