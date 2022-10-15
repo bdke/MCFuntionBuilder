@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MCFBuilder": {
+      "commandName": "Project",
+      "commandLineArgs": "compile"
+    }
+  }
+}

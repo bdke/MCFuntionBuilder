@@ -59,9 +59,8 @@ VARIABLES_TYPE: ('var' | 'global') ;
 
 
 createClass: 'new' IDENTIFIER '(' (expression (',' expression)*)? ')' ;
-classVariables: IDENTIFIER '.' IDENTIFIER ;
-classFunctions: IDENTIFIER '.' IDENTIFIER '(' (expression (',' expression)*)? ')'  ;
-functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')'; 
+classVariables: IDENTIFIER DOT IDENTIFIER ;
+functionCall: IDENTIFIER (DOT IDENTIFIER)? '(' (expression (',' expression)*)? ')'; 
 
 return: 'return' expression;
 
@@ -70,7 +69,6 @@ expression
     | IDENTIFIER #identifierExpression
     | createClass #createClassExpression
     | classVariables #classVariablesExpression
-    | classFunctions #classFunctionsExpression
     | functionCall #functionCallExpression
     | '(' expression ')' #parenthesizedExpression
     | '!' expression    #notExpression
@@ -106,6 +104,7 @@ NULL: 'null';
 
 block: '{' line* '}';
 
+DOT: '.';
 IFTYPES: 'entity' ;
 SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
 COMMENT: '//' ~[\r\n]* -> skip;

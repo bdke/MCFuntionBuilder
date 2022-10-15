@@ -1,3 +1,7 @@
 #sad:
 var sel = new Selector();
+sel.SetSelector("@s");
+sel.SetCoordinate(null,2,1);
+score global sc @s = 3;
 Write(sel.Value);
+Function.Call("Nice","urmom");

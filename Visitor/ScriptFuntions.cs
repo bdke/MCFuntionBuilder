@@ -56,9 +56,11 @@ namespace MCFBuilder
 
         public override object? VisitFunctionCall(MCFBuilderParser.FunctionCallContext context)
         {
-            var name = context.IDENTIFIER().GetText();
+            var name = context.IDENTIFIER(0).GetText();
             var args = context.expression().Select(Visit).ToArray();
-
+            var name2 = context.IDENTIFIER(1);
+            
+            if (name2 == null)
             if (ProgramVariables.GlobalVariables.ContainsKey(name))
             {
                 if (!ProgramVariables.GlobalVariables.ContainsKey(name))
@@ -96,22 +98,42 @@ namespace MCFBuilder
             {
                 throw new ArgumentException($"{name} is not existed");
             }
-            
+            else
+            {
+                if (Variables.ContainsKey(name))
+                {
+                    var _class = (BuiltInClass?)Variables[context.IDENTIFIER(0).GetText()];
+
+                    var method = _class.Methods.FirstOrDefault(v => v.Name == name2.GetText());
+
+                    if (method.Func == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
+                    return method.Func.Invoke(args);
+
+                }
+                else if (ProgramVariables.BuiltInClasses.ContainsKey(name))
+                {
+                    System.Type type = ProgramVariables.BuiltInClasses[name];
+                    return type.GetMethod(name2.GetText()).Invoke(null, new object?[] { args });
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
 
-        //public override object? VisitClassFunctionExpression(MCFBuilderParser.ClassFunctionExpressionContext context)
-        //{
-        //    Console.WriteLine(context.GetText());
-
-        //    return null;
-        //}
-
-        //TODO:
         public override object? VisitCreateClassExpression(MCFBuilderParser.CreateClassExpressionContext context)
         {
             var className = context.createClass().IDENTIFIER().GetText();
             if (ProgramVariables.BuiltInClasses.Where(v => v.Key == className).Any())
-                return ProgramVariables.BuiltInClasses.Where(v => v.Key == className).FirstOrDefault().Value;
+            {
+                System.Type type = ProgramVariables.BuiltInClasses.Where(v => v.Key == className).FirstOrDefault().Value;
+                return Activator.CreateInstance(typeof(Selector));
+            }
 
             throw new NotImplementedException();
         }
@@ -137,11 +159,6 @@ namespace MCFBuilder
             }
 
             return null;
-        }
-
-        public override object? VisitClassFunctionsExpression(MCFBuilderParser.ClassFunctionsExpressionContext context)
-        {
-            return "amogus";
         }
     }
 }

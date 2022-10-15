@@ -17,7 +17,15 @@ namespace MCFBuilder
 {
     public partial class ScriptVisitor : MCFBuilderBaseVisitor<object?>
     {
-        string? currentFile = null;
+        private static string? currentFile = null;
+        public static string? CurrentFile
+        {
+            get
+            {
+                return currentFile;
+            }
+        }
+
         Dictionary<string, object?> Variables { get; } = new();
         Dictionary<string, Dictionary<string, object?>> functionVariables { get; set; } = new();
         Dictionary<string,List<string>> tempVariables = new();
@@ -25,7 +33,7 @@ namespace MCFBuilder
         List<string>? tempOperators = null;
         List<TagsType> tags = new();
 
-        bool Init = false;
+        public bool Init = false;
 
         public ScriptVisitor()
         {
@@ -245,8 +253,13 @@ namespace MCFBuilder
 
         public override object? VisitProgram([NotNull] MCFBuilderParser.ProgramContext context)
         {
-            Init = true;
-            currentFile = "load";
+            FunctionCompiler.Lines = new();
+            FunctionCompiler.Lines.Lines = new();
+            return base.VisitProgram(context);
+        }
+
+        public void GlobalAssignment([NotNull] MCFBuilderParser.ProgramContext context)
+        {
             var lines = context.line();
 
             FunctionCompiler.Lines = new();
@@ -260,8 +273,7 @@ namespace MCFBuilder
                     Visit(line);
                 }
             }
-            Init = false;
-            return base.VisitProgram(context);
+            File.WriteAllText("load.mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
         }
     }
 }

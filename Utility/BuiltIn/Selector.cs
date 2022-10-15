@@ -1,10 +1,6 @@
-﻿using Antlr4.Runtime.Misc;
-using MCFBuilder.Type;
+﻿using MCFBuilder.Type;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCFBuilder.Utility.BuiltIn
 {
@@ -15,6 +11,9 @@ namespace MCFBuilder.Utility.BuiltIn
         {
             get
             {
+                //Selector
+                var selector = (selectorArgs.Selector != null) ? selectorArgs.Selector : throw new Exception();
+
                 //Coordinate
                 var coorX = (selectorArgs.Coordinates.X != null) ? $"x={selectorArgs.Coordinates.X}" : "";
                 var coorY = (selectorArgs.Coordinates.Y != null) ? $"y={selectorArgs.Coordinates.Y}" : "";
@@ -29,7 +28,7 @@ namespace MCFBuilder.Utility.BuiltIn
                 var distance = string.Join("..", new string[] { minDis, maxDis }.Where(v => v != string.Empty));
 
                 //Output
-                _value = $"[{string.Join(',', new string[] { coordinate, distance }.Where(v => v != string.Empty))}]";
+                _value = $"{selector}[{string.Join(',', new string[] { coordinate, distance }.Where(v => v != string.Empty))}]";
 
                 return _value;
             }
@@ -42,12 +41,24 @@ namespace MCFBuilder.Utility.BuiltIn
             Value = value;
             Methods.Add(new MethodInfo() { Name = nameof(SetCoordinate), Func = SetCoordinate});
             Methods.Add(new MethodInfo() { Name = nameof(SetDistance), Func = SetDistance });
+            Methods.Add(new MethodInfo() { Name = nameof(SetSelector), Func = SetSelector });
         }
 
         public Selector() : base(nameof(Selector))
         {
             Methods.Add(new MethodInfo() { Name = nameof(SetCoordinate), Func = SetCoordinate });
             Methods.Add(new MethodInfo() { Name = nameof(SetDistance), Func = SetDistance });
+            Methods.Add(new MethodInfo() { Name = nameof(SetSelector), Func = SetSelector });
+        }
+
+        private object? SetSelector(object?[]? args)
+        {
+            if (args != null && args.Length == 1)
+            {
+                selectorArgs.Selector = (string)args[0];
+            }
+
+            return null;
         }
 
         
@@ -56,7 +67,11 @@ namespace MCFBuilder.Utility.BuiltIn
             //args.Coordinates = new(x, y, z);
             if (args != null && args.Length == 3)
             {
-                selectorArgs.Coordinates = new((double?)args[0], (double?)args[1], (double?)args[2]);
+                selectorArgs.Coordinates = new(
+                    (args[0] != null) ? double.Parse(args[0].ToString()) : null,
+                    (args[1] != null) ? double.Parse(args[1].ToString()) : null,
+                    (args[2] != null) ? double.Parse(args[2].ToString()) : null
+                    );
             }
             return null;
         }
@@ -66,7 +81,10 @@ namespace MCFBuilder.Utility.BuiltIn
             //args.Distance = new(min, max);
             if (args != null && args.Length == 2)
             {
-                selectorArgs.Distance = new((float?)args[0], (float?)args[1]);
+                selectorArgs.Distance = new(
+                    float.Parse(args[0].ToString()),
+                    float.Parse(args[1].ToString())
+                    );
             }
             return null;
         }

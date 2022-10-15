@@ -13,11 +13,13 @@ namespace MCFBuilder.Type
     {
         public Coordinates Coordinates { get; set; }
         public Distance Distance { get; set; }
+        public string Selector { get; set; }
 
-        public SelectorArgs(Coordinates coordinates, Distance distance)
+        public SelectorArgs(Coordinates coordinates, Distance distance, string selector)
         {
             Coordinates = coordinates;
             Distance = distance;
+            Selector = selector;
         }
     }
 }

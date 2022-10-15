@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MCFBuilder.Utility;
 using MCFBuilder.Type;
+using MCFBuilder.Type.Compiler;
 #pragma warning disable CS8604 // 可能有 Null 參考引數。
 namespace MCFBuilder
 {
@@ -46,6 +47,15 @@ namespace MCFBuilder
                                 true)
                             )
                          );
+                    if ((int?)Visit(context.expression()) != null)
+                        FunctionCompiler.Lines
+                            .Lines
+                            .Add(
+                                new($"{CommandAttribute.Compile()}scoreboard players set " +
+                                $"{selector} " +
+                                $"{varName} " +
+                                $"{(int?)Visit(context.expression())}")
+                            );
 
                 }
                 else if (value is string)

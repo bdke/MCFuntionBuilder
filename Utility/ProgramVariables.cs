@@ -18,9 +18,10 @@ namespace MCFBuilder.Utility
             (from i in typeof(ProgramFunction).GetMethods(BindingFlags.Public | BindingFlags.Static) select i.Name)
             .ToArray();
 
-        public static Dictionary<string, BuiltInClass> BuiltInClasses { get; } = new()
+        public static Dictionary<string, System.Type> BuiltInClasses { get; } = new()
         {
-            [nameof(Selector)] = new Selector()
+            [nameof(Selector)] = typeof(Selector),
+            [nameof(Function)] = typeof(Function),
         };
 
         public static Dictionary<string, object?> GlobalVariables { get; } = VariablesInit();
