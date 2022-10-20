@@ -7,14 +7,19 @@ using System.Threading.Tasks;
 using Antlr4.Runtime;
 using MCFBuilder.Type;
 using MCFBuilder.Utility;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
+using MethodTimer;
 
 namespace MCFBuilder
 {
     public static class Execute
     {
         public static string? Namespace { get; set; }
+        public static string? CurrentFile { get; set; }
+
+        [Time($"Compiled code...")]
         public static void Run(string filePath)
         {
             var fileContents = File.ReadAllText(filePath);
@@ -38,6 +43,7 @@ namespace MCFBuilder
             //File.WriteAllText("load.mcfunction", String.Join('\n',scoreboardString.Concat(scoreboardInitValues)));
         }
 
+        [Time("Loaded global variables...")]
         private static void LoadGlobal(string filePath)
         {
             var fileContents = File.ReadAllText(filePath);
@@ -51,15 +57,13 @@ namespace MCFBuilder
             visitor.Init = false;
         }
 
+        [Time("Application finished...")]
         public static async Task<int> Main(string[] args)
         {
+            
             if (args.Length < 1)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Input arguments must contain at least 1");
-                Console.ResetColor();
-
-
+                ErrorMessage.Send("Input arguments must contain at least 1");
                 return 1;
             }
 
@@ -68,9 +72,24 @@ namespace MCFBuilder
             //Run("Test/test.mcf");
             if (command == "compile")
             {
-                ////TODO: Actions during running
                 //string[] allfiles = Directory.GetFiles("./", "*.*", SearchOption.AllDirectories);
                 //var targets = allfiles.Where(v => v.EndsWith(".mcf"));
+                
+                if (args.Length > 1)
+                {
+                    try
+                    {
+                        int logLevel = int.Parse(args[1]);
+                        Logging.LogLevel = logLevel;
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage.Send($"Invalid value of loglevel: '{args[1]}'");
+                        Logging.Fatal(e);
+                        
+                    }
+                }
+                Logging.Init();
 
                 string[] namespaces = Directory.GetFiles(".", "*.*", SearchOption.AllDirectories)
                     .Where(v => v.EndsWith(".mcfconfig"))
@@ -78,17 +97,22 @@ namespace MCFBuilder
 
                 foreach (string ns in namespaces)
                 {
-                    DatapackData datapackData = JsonSerializer.Deserialize<DatapackData>(File.ReadAllText(ns));
+                    DatapackData datapackData = JsonConvert.DeserializeObject<DatapackData>(File.ReadAllText(ns));
 
                     Namespace = datapackData.Name;
 
-                    foreach (string file in datapackData.FilesPath)
+                    string[] scripts = Directory.GetFiles($"./{datapackData.Name}/scripts", "*.mcf", SearchOption.AllDirectories)
+                        .ToArray();
+
+                    foreach (string file in scripts)
                     {
+                        CurrentFile = file;
                         LoadGlobal(file);
                     }
 
-                    foreach (string file in datapackData.FilesPath)
+                    foreach (string file in scripts)
                     {
+                        CurrentFile = file;
                         Run(file);
                     }
                 }
@@ -101,37 +125,36 @@ namespace MCFBuilder
             }
             else if (command == "new")
             {
+                Logging.Init();
                 if (args.Length < 3)
                 {
                     if (args.Length == 2)
-                        Message.Send("Missing Argument: version");
+                        ErrorMessage.Send("Missing Argument: version");
 
                     return 1;
                 }
 
-                string name = args[1];
+                string name = args[1].ToLower();
                 int version = int.Parse(args[2]);
 
                 if (Directory.Exists(name))
                 {
-                    Message.Send($"namespace '{name}' is already existed");
+                    ErrorMessage.Send($"namespace '{name}' is already existed");
                     return 1;
                 }
 
                 string[] allfiles = Directory.GetFiles(".", "*.*", SearchOption.AllDirectories);
-                var targets = allfiles.Where(v => v.EndsWith(".mcf")).ToList();
 
 
                 DatapackData datapackData = new DatapackData()
                 {
                     Name = name,
-                    FilesPath = targets
                 };
 
                 //Create folders
                 Directory.CreateDirectory(name);
 
-                string jsonString = JsonSerializer.Serialize(datapackData);
+                string jsonString = JsonConvert.SerializeObject(datapackData);
                 File.WriteAllText($"{name}/.mcfconfig", jsonString);
                 
                 
@@ -146,10 +169,12 @@ namespace MCFBuilder
                 Directory.CreateDirectory($"{name}/data/{name}/functions");
                 Directory.CreateDirectory($"{name}/data/{name}/predicates");
                 Directory.CreateDirectory($"{name}/data/{name}/loot_tables");
+                Directory.CreateDirectory($"{name}/scripts");
+
+                Console.WriteLine($"created new namespace: {name}");
             }
             else
-                Message.Send("Missing Argument: command");
-
+                ErrorMessage.Send("Missing Argument: command");
 
             return 0;
         }
@@ -158,6 +183,6 @@ namespace MCFBuilder
     struct DatapackData
     {
         public string Name { get; set; }
-        public List<string> FilesPath { get; set; }
+        //public List<string> FilesPath { get; set; }
     }
 }

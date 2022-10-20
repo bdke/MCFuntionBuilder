@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MCFBuilder.Utility
 {
-    public static class Message
+    public static class ErrorMessage
     {
         public static void Send(string message)
         {
@@ -17,7 +17,9 @@ namespace MCFBuilder.Utility
 
         public static void Send(ErrorMessageType errorType, string message, int line, int pos)
         {
-
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{errorType}: {message}\nin {line}:{pos}");
+            Console.ResetColor();
         }
     }
 

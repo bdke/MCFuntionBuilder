@@ -12,6 +12,7 @@ using Antlr4.Runtime.Tree;
 using MCFBuilder.Visitor.BuiltInFuntions;
 using System.Reflection;
 using MCFBuilder.Type.Compiler;
+using System.Xml.Linq;
 
 namespace MCFBuilder
 {
@@ -40,10 +41,24 @@ namespace MCFBuilder
 
         }
 
+        //public override object? VisitAssignFile()
+        //{
+        //    RemoveScoreboards();
+        //    currentFile = context.GetText().Remove(0,1).Replace(":","");
+        //    FunctionCompiler.Lines = new();
+        //    FunctionCompiler.Lines.Lines = new();
+        //    FunctionCompiler.Lines.FilePath = currentFile;
+        //    Variables.Clear();
+        //    tempVariables.Clear();
+        //    functionVariables.Clear();
+        //    scoreboards.Clear();
+        //    return null;
+        //}
+
         public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
         {
             RemoveScoreboards();
-            currentFile = context.GetText().Remove(0,1).Replace(":","");
+            currentFile = context.GetText()[1..];
             FunctionCompiler.Lines = new();
             FunctionCompiler.Lines.Lines = new();
             FunctionCompiler.Lines.FilePath = currentFile;
@@ -51,6 +66,7 @@ namespace MCFBuilder
             tempVariables.Clear();
             functionVariables.Clear();
             scoreboards.Clear();
+
             return null;
         }
 
@@ -68,7 +84,7 @@ namespace MCFBuilder
             }
             if (currentFile != null)
             {
-                File.WriteAllText(currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
+                File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
             }
         }
 

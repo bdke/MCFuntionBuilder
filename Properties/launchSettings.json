@@ -2,7 +2,7 @@
   "profiles": {
     "MCFBuilder": {
       "commandName": "Project",
-      "commandLineArgs": "compile"
+      "commandLineArgs": "compile 0"
     }
   }
 }

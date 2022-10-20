@@ -25,7 +25,7 @@ forBlock: 'for' '(' IDENTIFIER 'in' (INTEGER 'to' INTEGER | dict | list | IDENTI
 
 assignFunction: 'def' IDENTIFIER '(' IDENTIFIER? (',' IDENTIFIER)* ')' block ;
 
-assignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ':';
+
 
 
 // assignment: ((VARIABLES_TYPE)? IDENTIFIER ( ':' IDENTIFIER ) selector assignOp expression selector? ) 
@@ -78,6 +78,8 @@ expression
     | expression boolOp expression #booleanExpression
     
 ;
+assignFile : AssignFile;
+AssignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ~[\r\n]* ;
 
 //operator
 multOp: '*' | '/';
