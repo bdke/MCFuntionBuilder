@@ -1,23 +1,3 @@
-<style>
-    .keyword {
-        color: #cc99cd;
-    }
-    .operator {
-        color: #67cdcc;
-    }
-    .id {
-        color: cyan
-    }
-    .string {
-        color: #7ec699
-    }
-    .int {
-        color: #f08d49
-    }
-    .selector {
-        color: red
-    }
-</style>
 # Syntax
 This will include all syntaxes of the mcfbuilder
 ## Basic Syntax
