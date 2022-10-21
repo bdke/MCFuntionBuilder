@@ -84,6 +84,7 @@ namespace MCFBuilder
             }
             if (currentFile != null)
             {
+                Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/{currentFile}.mcfunction {string.Join('\n', FunctionCompiler.Lines.Lines)}");
                 File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
             }
         }
@@ -146,7 +147,7 @@ namespace MCFBuilder
                 for (int e = 0; e < d.STRING().Length; e++)
                 {
                     dict.Add(d.STRING()[e].GetText()[1..^1]
-                        , this.VisitConstant(d.constant()[e]));
+                        , this.Visit(d.expression()[e]));
                 }
                 foreach (var item in dict.Keys)
                 {
@@ -157,9 +158,9 @@ namespace MCFBuilder
             if (context.list() is { } l)
             {
                 List<object?> list = new();
-                foreach (var item in l.constant())
+                foreach (var item in l.expression())
                 {
-                    list.Add(VisitConstant(item));
+                    list.Add(Visit(item));
                 }
                 foreach (var item in list)
                 {
@@ -265,6 +266,34 @@ namespace MCFBuilder
             }
             else
                 throw new NotImplementedException();
+        }
+
+        public override object? VisitGetIdentifierDataExpression([NotNull] MCFBuilderParser.GetIdentifierDataExpressionContext context)
+        {
+            var target = Visit(context.expression(0));
+            var value = Visit(context.expression(1));
+
+            if (target is List<object?> list)
+            {
+                if (value is int i)
+                {
+                    return list[i];
+                }
+            }
+            else if (target is Dictionary<object, object?> dict)
+            {
+                return dict[value];
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public override object? VisitCommand(MCFBuilderParser.CommandContext context)
+        {
+            FunctionCompiler.Lines.Lines.Add(context.GetText()[1..]);
+
+
+            return null;
         }
 
         public override object? VisitProgram([NotNull] MCFBuilderParser.ProgramContext context)

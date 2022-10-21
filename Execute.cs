@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using MethodTimer;
+using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 namespace MCFBuilder
 {
@@ -57,10 +59,15 @@ namespace MCFBuilder
             visitor.Init = false;
         }
 
+        private static void ErrorListener(object? sender, FirstChanceExceptionEventArgs args)
+        {
+            Logging.Error(args.Exception);
+        }
+
         [Time("Application finished...")]
         public static async Task<int> Main(string[] args)
         {
-            
+            AppDomain.CurrentDomain.FirstChanceException += ErrorListener;
             if (args.Length < 1)
             {
                 ErrorMessage.Send("Input arguments must contain at least 1");
@@ -94,6 +101,12 @@ namespace MCFBuilder
                 string[] namespaces = Directory.GetFiles(".", "*.*", SearchOption.AllDirectories)
                     .Where(v => v.EndsWith(".mcfconfig"))
                     .ToArray();
+                if (namespaces.Length == 0)
+                {
+                    ErrorMessage.Send("Unable to find any working namespaces, please create a new namepsace with 'new' command");
+                    Logging.Error(ErrorType.RuntimeException,"No namepsace avaliable");
+                    return 1;
+                }
 
                 foreach (string ns in namespaces)
                 {

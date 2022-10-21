@@ -3,7 +3,7 @@ grammar MCFBuilder;
 
 program: line* EOF;
 
-line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBlock | assignFile | COMMENT | COMMAND;
+line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBlock | assignFile | COMMENT | command;
 
 statement: (assignment | functionCall | return | global) SEMI;
 
@@ -64,8 +64,11 @@ functionCall: IDENTIFIER (DOT IDENTIFIER)? '(' (expression (',' expression)*)? '
 
 return: 'return' expression;
 
+
+
 expression
-    : constant  #constantExpression
+    : expression '[' expression ']' #getIdentifierDataExpression
+    | constant  #constantExpression
     | IDENTIFIER #identifierExpression
     | createClass #createClassExpression
     | classVariables #classVariablesExpression
@@ -76,8 +79,9 @@ expression
     | expression addOp expression   #additiveExpression
     | expression compareOp expression #comparisionExpression
     | expression boolOp expression #booleanExpression
-    
 ;
+
+
 assignFile : AssignFile;
 AssignFile: '#' (IDENTIFIER ('/' IDENTIFIER)*) ~[\r\n]* ;
 
@@ -93,9 +97,11 @@ BOOL_OPERATOR: '&&' | '||';
 
 
 //data type
-list: '[' constant? (',' constant)* ']' ;
-dict: '{' (STRING ':' constant)? (',' STRING ':' constant)* '}' ;
+
 constant: INTEGER | FLOAT | STRING | BOOL | dict | list | NULL;
+
+list: '[' expression? (',' expression)* ']' ;
+dict: '{' (STRING ':' expression)? (',' STRING ':' expression)* '}' ;
 
 number: INTEGER | FLOAT ;
 INTEGER: [0-9]+;
@@ -109,8 +115,9 @@ block: '{' line* '}';
 DOT: '.';
 IFTYPES: 'entity' ;
 SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
+command: COMMAND ;
+COMMAND: '/' ~[\r\n]*;
 COMMENT: '//' ~[\r\n]* -> skip;
-COMMAND: '/' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
 SEMI: ';';

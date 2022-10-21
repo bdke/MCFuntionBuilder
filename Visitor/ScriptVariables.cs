@@ -1,5 +1,7 @@
-﻿using MCFBuilder.Type;
+﻿using Antlr4.Runtime.Misc;
+using MCFBuilder.Type;
 using MCFBuilder.Utility;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,16 +30,16 @@ namespace MCFBuilder
                 for (int e = 0; e < d.STRING().Length; e++)
                 {
                     dict.Add(d.STRING()[e].GetText()[1..^1]
-                        , this.VisitConstant(d.constant()[e]));
+                        , this.Visit(d.expression()[e]));
                 }
                 return dict;
             }
             if (context.list() is { } l)
             {
                 List<object?> list = new();
-                foreach (var item in l.constant())
+                foreach (var item in l.expression())
                 {
-                    list.Add(VisitConstant(item));
+                    list.Add(Visit(item));
                 }
                 return list;
             }

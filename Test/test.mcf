@@ -1,7 +1,3 @@
 #sad:
-var sel = new Selector();
-sel.SetSelector("@s");
-sel.SetCoordinate(null,2,1);
-score global sc @s = 3;
-Write(sel.Value);
-Function.Call(Function.GetCurrentNamespace(),"urmom");
+var le = ["123",4444];
+le[0];
