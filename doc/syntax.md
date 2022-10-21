@@ -60,7 +60,6 @@ The code after this line will be written to `./foo/bar.mcfunction`
     </code>
     </br>
     </br>
-
     declaring value and selector is optional
 </br>
 
