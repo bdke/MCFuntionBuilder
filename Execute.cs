@@ -67,6 +67,7 @@ namespace MCFBuilder
         [Time("Application finished...")]
         public static async Task<int> Main(string[] args)
         {
+            
             AppDomain.CurrentDomain.FirstChanceException += ErrorListener;
             if (args.Length < 1)
             {
