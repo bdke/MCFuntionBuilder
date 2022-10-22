@@ -9,7 +9,7 @@ Download the files in the [release](https://github.com/bdke/MCFuntionBuilder/rel
 execute the .exe file inside the folder with a command line or add the path to the enviroment variables
 ### Command
 ```
-mcfbuilder compile (LOGGING LEVEL 0-5) 
+mcfbuilder compile <LOGGING LEVEL 0-5> 
 ```
 The command will compile all namespaces with a `.mcfconfig` inside
 ```

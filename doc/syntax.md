@@ -145,7 +145,7 @@ if entity (@s) {
 `condition` must be a `string` or `selector`  
   
 Equavilent to  
-```
+```mcfuntion
 execute if entity @s run say hi
 ```
 
@@ -160,7 +160,7 @@ if score (foo @s > bar @s) {
 `foo` and `bar` must be a scorebaord variables  
   
 Equavilent to
-```
+```mcfunction
 execute if score @s foo > @s bar run say egggggggg
 ```
   
@@ -171,7 +171,7 @@ if predicate ("namespace:path/to/predicate") {
 }
 ```
 Equavilent to
-```
+```mcfunction
 execute if predicate namespace:path/to/predicate run say hi
 ```
 
@@ -183,7 +183,7 @@ if block ~ ~ ~ ("grass_block") {
 ```
   
 Equavilent to
-```
+```mcfunction
 execute if block ~ ~ ~ grass_block run say block
 ```
 
@@ -194,7 +194,7 @@ if blocks ~ ~ ~ ~ ~ ~ ~ ~ ~ all {
 }
 ```
 Equavilent to
-```
+```mcfunction
 execute if blocks ~ ~ ~ ~ ~ ~ ~ ~ ~ all run say blocky
 ```
 
@@ -205,7 +205,7 @@ if data entity @s ("SpawnX") {
 }
 ```
 Equavilent to
-```
+```mcfunction
 execute if data entity @s SpawnX run say spawn
 ```
 ---

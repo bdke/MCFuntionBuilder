@@ -25,7 +25,7 @@ It will execute the code if it is a valid `C#` code with `Main` method
 Function.Call("namespace","path/to/mcfuntion");
 ```
 Equavilent to
-```
+```mcfunction
 function namespace:path/to/mcfuntion
 ```
 ---
