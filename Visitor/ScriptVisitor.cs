@@ -197,27 +197,22 @@ namespace MCFBuilder
         public override object? VisitIfBlock(MCFBuilderParser.IfBlockContext context)
         {
             var exp = context.expression();
-            var type = context.IFTYPES().GetText();
+            var type = context.IFTYPES();
 
             int? currentNum = null;
 
             CommandAttribute.IsContainElse = false;
             if (Visit(exp) is string s)
             {
-                currentNum = IfConditionHandler.Add(s, type);
+                currentNum = IfConditionHandler.Add(s, type.GetText());
                 Visit(context.block());
             }
-            else
+            else if (type == null)
             {
-                //if (IsTrue(Visit(exp)))
-                //{
-                //    Visit(context.block());
-                //}
-                //if (context.elseIfBlock() != null)
-                //{
-                //    Visit(context.elseIfBlock());
-                //}
-
+                if (IsTrue(Visit(exp)))
+                {
+                    Visit(context.block());
+                }
             }
 
 
@@ -308,7 +303,7 @@ namespace MCFBuilder
             var lines = context.line();
 
             FunctionCompiler.Lines = new();
-            FunctionCompiler.Lines.Lines = new();
+            FunctionCompiler.Lines.Lines = new() { "scoreboard objectives add .number dummy" };
             FunctionCompiler.Lines.FilePath = currentFile;
 
             foreach (var line in lines)
@@ -318,6 +313,7 @@ namespace MCFBuilder
                     Visit(line);
                 }
             }
+            
             File.WriteAllText("load.mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
         }
     }

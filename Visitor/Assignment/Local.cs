@@ -275,7 +275,7 @@ namespace MCFBuilder
 
             return null;
         }
-
+        //TODO stores all selector used
         public override object? VisitLocalTagsAssignment(MCFBuilderParser.LocalTagsAssignmentContext context)
         {
             var selector = (string?)Visit(context.selector());

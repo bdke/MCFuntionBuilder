@@ -7,7 +7,7 @@ line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBloc
 
 statement: (assignment | functionCall | return | global) SEMI;
 
-ifBlock: 'if' IFTYPES '(' expression ')' block ('else' elseIfBlock)?;
+ifBlock: 'if' IFTYPES? '(' expression ')' block ('else' elseIfBlock)?;
 executeBlock: 'execute' (executeTypes)+ block ;
 executeTypes
             : ('as' selector) #ExecuteAsExpression

@@ -62,8 +62,8 @@ namespace MCFBuilder.Utility
 
         public void Multiply(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} *= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set @s .number {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} *= @s .number");
         }
 
         public void Multiply(string? name, string? selector, string? selector2)
@@ -73,8 +73,8 @@ namespace MCFBuilder.Utility
 
         public void Divide(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} /= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set @s .number {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} /= @s .number");
         }
 
         public void Divide(string? name, string? selector, string? selector2)
@@ -84,8 +84,8 @@ namespace MCFBuilder.Utility
 
         public void Remainder(object? value, string? selector)
         {
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set .number _ {value}");
-            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} %= .number _");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players set @s .number {value}");
+            FunctionCompiler.Lines.Lines.Add($"{CommandAttribute.Compile()}scoreboard players operation {selector} {ScoreboardValues.Name} %= @s .number");
         }
 
         public void Remainder(string? name, string? selector, string? selector2)

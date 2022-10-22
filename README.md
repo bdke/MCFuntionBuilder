@@ -17,9 +17,9 @@ mcfbuilder new [datapack version (1-10)] [namespace]
 ```
 this will initialize a directory with `.mcfconfig`
 ## Syntax
-Refer to [Syntax]()
+Refer to [Syntax](https://github.com/bdke/MCFuntionBuilder/blob/master/doc/syntax.md)
 ## Built In
-Refer to [Built In Functions]()
+Refer to [Built In Functions](https://github.com/bdke/MCFuntionBuilder/blob/master/doc/builtin.md)
 
 ## Contributing
 Feel free to contribute! :)<br/>
