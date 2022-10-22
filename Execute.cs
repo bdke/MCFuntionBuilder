@@ -34,7 +34,7 @@ namespace MCFBuilder
             FunctionCompiler.Lines = new();
             ScriptVisitor visitor = new ScriptVisitor();
             visitor.Visit(context);
-            visitor.RemoveScoreboards();
+            visitor.FunctionEndAction();
             //var scoreboardString = from i in ProgramVariables.ScoreboardObjects select $"scoreboard objectives add " +
             //                       $"{i.ScoreboardValues.Name} " +
             //                       $"{ScoreboardValues.GetScoreboardTypes(i.ScoreboardValues.ScoreboardType)}";
@@ -114,6 +114,10 @@ namespace MCFBuilder
                     DatapackData datapackData = JsonConvert.DeserializeObject<DatapackData>(File.ReadAllText(ns));
 
                     Namespace = datapackData.Name;
+
+                    Directory.Delete($"./{datapackData.Name}/data/{datapackData.Name}/functions", true);
+                    Directory.CreateDirectory($"./{datapackData.Name}/data/{datapackData.Name}/functions");
+
 
                     string[] scripts = Directory.GetFiles($"./{datapackData.Name}/scripts", "*.mcf", SearchOption.AllDirectories)
                         .ToArray();

@@ -43,7 +43,7 @@ namespace MCFBuilder
 
         //public override object? VisitAssignFile()
         //{
-        //    RemoveScoreboards();
+        //    FunctionEndAction();
         //    currentFile = context.GetText().Remove(0,1).Replace(":","");
         //    FunctionCompiler.Lines = new();
         //    FunctionCompiler.Lines.Lines = new();
@@ -57,7 +57,7 @@ namespace MCFBuilder
 
         public override object? VisitAssignFile(MCFBuilderParser.AssignFileContext context)
         {
-            RemoveScoreboards();
+            FunctionEndAction();
             currentFile = context.GetText()[1..];
             FunctionCompiler.Lines = new();
             FunctionCompiler.Lines.Lines = new();
@@ -70,22 +70,26 @@ namespace MCFBuilder
             return null;
         }
 
-        public void RemoveScoreboards()
+        public void FunctionEndAction()
         {
             foreach (var item in scoreboards)
             {
                 FunctionCompiler.Lines.Lines.Add($"scoreboard objectives remove {item.ScoreboardValues.Name}");
-                
             }
 
             foreach (var item in tags)
             {
-                FunctionCompiler.Lines.Lines.Add($"tag @e remove {item.Name}");
+                var selectors = from i in item.Value where i.Value select i.Key;
+                foreach (string selector in selectors)
+                {
+                    FunctionCompiler.Lines.Lines.Add($"tag {selector} remove {item.Name}");
+                }
+                
             }
             if (currentFile != null)
             {
                 Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/{currentFile}.mcfunction {string.Join('\n', FunctionCompiler.Lines.Lines)}");
-                File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
+                File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction:\n", string.Join('\n', FunctionCompiler.Lines.Lines));
             }
         }
 

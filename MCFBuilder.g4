@@ -36,13 +36,13 @@ assignment: localScoresAssignment || scoresEqual || localTagsAssignment ||  gene
 
 generalAssignment: localAssignment || operation;
 
-localTagsAssignment: 'tag' 'var' IDENTIFIER selector '=' BOOL ;
+localTagsAssignment: 'tag' 'var' IDENTIFIER (selector '=' BOOL)? ;
 localAssignment: 'var' IDENTIFIER ('=' expression)? ;
 localScoresAssignment: 'score' 'var' IDENTIFIER (selector '=' expression)?;
 
 global: globalAssignment || globalScoresAssignment || globalTagsAssignment ;
 
-globalTagsAssignment: 'tag' 'global' IDENTIFIER selector '=' BOOL ;
+globalTagsAssignment: 'tag' 'global' IDENTIFIER (selector '=' BOOL)? ;
 globalAssignment: 'global' IDENTIFIER ('=' expression)? ;
 globalScoresAssignment: 'score' 'global' IDENTIFIER (selector '=' expression)?;
 

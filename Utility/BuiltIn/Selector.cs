@@ -12,7 +12,7 @@ namespace MCFBuilder.Utility.BuiltIn
             get
             {
                 //Selector
-                var selector = (selectorArgs.Selector != null) ? selectorArgs.Selector : throw new Exception();
+                var selector = (selectorArgs.Selector != null) ? selectorArgs.Selector : throw new NotImplementedException();
 
                 //Coordinate
                 var coorX = (selectorArgs.Coordinates.X != null) ? $"x={selectorArgs.Coordinates.X}" : "";
