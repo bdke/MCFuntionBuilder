@@ -7,7 +7,10 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Test\native.cs" />
+    <Antlr4 Remove="Test\**" />
+    <Compile Remove="Test\**" />
+    <EmbeddedResource Remove="Test\**" />
+    <None Remove="Test\**" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="C:\Users\William\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
@@ -17,12 +20,6 @@
     <Content Include="MCFBuilder.g4">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Test\native.cs">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,9 +38,6 @@
 
   <ItemGroup>
     <None Update="NLog.xsd">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Test\test.mcf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
