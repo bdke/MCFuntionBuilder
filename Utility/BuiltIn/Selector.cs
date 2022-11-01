@@ -112,5 +112,10 @@ namespace MCFBuilder.Utility.BuiltIn
                     throw new ArgumentException();
             }
         }
+
+        public override string? ToString()
+        {
+            return Value;
+        }
     }
 }

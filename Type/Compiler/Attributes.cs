@@ -1,10 +1,12 @@
 ﻿using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
+using MCFBuilder.Utility.BuiltIn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MCFBuilder.Type.Compiler
 {
@@ -45,6 +47,18 @@ namespace MCFBuilder.Type.Compiler
                     else if (ic == IfCount && !IsContainElse)
                         s += "if " + IfItem.Last() + " ";
                 }
+                else if (attr.AttributeType == AttributeType.UNLESS)
+                {
+                    ic++;
+                    for (int i = 0; i < ic - 1; i++)
+                    {
+                        s += "unless " + IfItem[i] + " ";
+                    }
+                    if (ic == IfCount && IsContainElse)
+                        s += "unless " + IfItem.Last() + " ";
+                    else if (ic == IfCount && !IsContainElse)
+                        s += "unless " + IfItem.Last() + " ";
+                }
                 else if (attr.AttributeType == AttributeType.EXECUTE)
                 {
                     s += attr.Value + " ";
@@ -58,22 +72,108 @@ namespace MCFBuilder.Type.Compiler
 
     public static class IfConditionHandler
     {
-        public static int Add(string condition, string type)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="selector"></param>
+        /// <param name="value"></param>
+        /// <param name="compareOp"></param>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static int Add(string name, string selector, string compareOp, int num)
         {
-            switch (type)
+            switch (compareOp)
             {
-                case "entity":
-                    CommandAttribute.Attributes.Add(new($"entity {condition}", AttributeType.IF));
+                case "==":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches {num}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "!=":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches {num}", AttributeType.UNLESS));
+                    return CommandAttribute.Attributes.Count - 1;
+                case ">=":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches {num}..", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case ">":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches {num+1}..", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "<=":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches ..{num}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "<":
+                    CommandAttribute.Attributes.Add(new($"score {selector} {name} matches ..{num-1}", AttributeType.IF));
                     return CommandAttribute.Attributes.Count - 1;
                 default:
                     throw new ArgumentException();
             }
         }
 
-        public static void Add(MCFBuilderParser.ExpressionContext condition, string type)
+        public static int Add(string left, string selectorLeft, string right, string selectorRight, string compareOp)
         {
-
+            switch (compareOp)
+            {
+                case "==":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} = {selectorRight} {right}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "!=":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} = {selectorRight} {right}", AttributeType.UNLESS));
+                    return CommandAttribute.Attributes.Count - 1;
+                case ">=":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} >= {selectorRight} {right}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case ">":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} > {selectorRight} {right}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "<=":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} <= {selectorRight} {right}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "<":
+                    CommandAttribute.Attributes.Add(new($"score {selectorLeft} {left} < {selectorRight} {right}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                default:
+                    throw new ArgumentException();
+            }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static int Add(object? condition, string type)
+        {
+            switch (type)
+            {
+                case "entity":
+                    CommandAttribute.Attributes.Add(new($"entity {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "predicate":
+                    CommandAttribute.Attributes.Add(new($"predicate {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "block":
+                    CommandAttribute.Attributes.Add(new($"block {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "blocks":
+                    CommandAttribute.Attributes.Add(new($"blocks {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "data block":
+                    CommandAttribute.Attributes.Add(new($"data block {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "data entity":
+                    CommandAttribute.Attributes.Add(new($"data entity {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                case "data storage":
+                    CommandAttribute.Attributes.Add(new($"data storage {(string?)condition}", AttributeType.IF));
+                    return CommandAttribute.Attributes.Count - 1;
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+
 
         public static void Remove(int? num)
         {
@@ -109,6 +209,7 @@ namespace MCFBuilder.Type.Compiler
     public enum AttributeType
     {
         IF,
+        UNLESS,
         EXECUTE
     }
 }

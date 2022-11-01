@@ -7,14 +7,27 @@ line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBloc
 
 statement: (assignment | functionCall | return | global) SEMI;
 
-ifBlock: 'if' IFTYPES? '(' expression ')' block ('else' elseIfBlock)?;
+ifBlock
+    : 'if' '(' expression ')' block ('else' elseIfBlock)? #IfStandardExpression
+    | 'if' 'entity' '(' selector ')' block ('else' elseIfBlock)? #IfEntityExpression
+    | 'if' 'score' '(' IDENTIFIER selector compareOp expression ')' block ('else' elseIfBlock)? #IfScoreMatchesCompareExpression
+    | 'if' 'score' expression ('to' expression)? '(' IDENTIFIER selector ')' block ('else' elseIfBlock)? #IfScoreMatchesExpression
+    | 'if' 'score' '('IDENTIFIER selector compareOp IDENTIFIER selector ')' block ('else' elseIfBlock)? #IfScoreCompareExpression
+    | 'if' 'predicate' '(' expression ',' expression ')' block ('else' elseIfBlock)? #IfPredicateExpression
+    | 'if' 'block' vector '(' expression ')' block ('else' elseIfBlock)? #IfBlockExpression
+    | 'if' 'blocks' vector vector vector IFBLOCKSTYPE block ('else' elseIfBlock)? #IfBlocksExpression
+    | 'if' 'data' 'block' vector expression block ('else' elseIfBlock)? #IfDataBlockExpression
+    | 'if' 'data' 'entity' selector expression block ('else' elseIfBlock)? #IfDataEntityExpression
+    | 'if' 'data' 'storage' expression expression block ('else' elseIfBlock)? #IfDataStorageExpression
+    ;
+
 executeBlock: 'execute' (executeTypes)+ block ;
 executeTypes
             : ('as' selector) #ExecuteAsExpression
             | ('at' selector) #ExecuteAtExpression
             | ('positioned' (('as' selector) | (vector))) #ExeuctePositionedExpression
             ;
-vector: '~' number? '~' number? '~' number? ;
+vector: '~' expression? '~' expression? '~' expression? ;
 
 elseIfBlock: block | ifBlock;
 
@@ -53,7 +66,7 @@ operation: IDENTIFIER selector? assignOp expression ;
 scoresEqual: IDENTIFIER selector assignOp IDENTIFIER selector ;
 
 
-selector: SELECTOR || STRING || IDENTIFIER;
+selector: SELECTOR | expression ;
 
 VARIABLES_TYPE: ('var' | 'global') ;
 
@@ -113,7 +126,8 @@ NULL: 'null';
 block: '{' line* '}';
 
 DOT: '.';
-IFTYPES: 'entity' ;
+IFTYPES: 'entity' | 'score' ;
+IFBLOCKSTYPE: 'all' | 'masked' ;
 SELECTOR: ('@' ('s'|'a'|'r'|'e'|'p'));
 command: COMMAND ;
 COMMAND: '/' ~[\r\n]*;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Antlr4.Runtime.Misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,6 +70,26 @@ namespace MCFBuilder
             throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
         }
         #endregion
+
+        public override object? VisitBooleanExpression([NotNull] MCFBuilderParser.BooleanExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+            var boolOp = context.boolOp().GetText();
+
+            if (left is bool l && right is bool r)
+                switch (boolOp)
+                {
+                    case "&&":
+                        return l && r;
+                    case "||":
+                        return l || r;
+                    default:
+                        throw new ArgumentException();
+                }
+            else
+                throw new ArgumentException();
+        }
 
         public override object? VisitComparisionExpression(MCFBuilderParser.ComparisionExpressionContext context)
         {

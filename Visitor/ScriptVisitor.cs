@@ -13,6 +13,9 @@ using MCFBuilder.Visitor.BuiltInFuntions;
 using System.Reflection;
 using MCFBuilder.Type.Compiler;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MCFBuilder
 {
@@ -66,6 +69,7 @@ namespace MCFBuilder
             tempVariables.Clear();
             functionVariables.Clear();
             scoreboards.Clear();
+            tags.Clear();
 
             return null;
         }
@@ -88,8 +92,8 @@ namespace MCFBuilder
             }
             if (currentFile != null)
             {
-                Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/{currentFile}.mcfunction {string.Join('\n', FunctionCompiler.Lines.Lines)}");
-                File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction:\n", string.Join('\n', FunctionCompiler.Lines.Lines));
+                Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/{currentFile}.mcfunction:\n{string.Join('\n', FunctionCompiler.Lines.Lines)}");
+                File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
             }
         }
 
@@ -198,39 +202,39 @@ namespace MCFBuilder
             return null;
         }
 
-        public override object? VisitIfBlock(MCFBuilderParser.IfBlockContext context)
-        {
-            var exp = context.expression();
-            var type = context.IFTYPES();
+        //public override object? VisitIfBlock(MCFBuilderParser.IfBlockContext context)
+        //{
+        //    var exp = context.expression();
+        //    var type = context.IFTYPES();
 
-            int? currentNum = null;
+        //    int? currentNum = null;
 
-            CommandAttribute.IsContainElse = false;
-            if (Visit(exp) is string s)
-            {
-                currentNum = IfConditionHandler.Add(s, type.GetText());
-                Visit(context.block());
-            }
-            else if (type == null)
-            {
-                if (IsTrue(Visit(exp)))
-                {
-                    Visit(context.block());
-                }
-            }
+        //    CommandAttribute.IsContainElse = false;
+        //    if (type != null)
+        //    {
+        //        currentNum = IfConditionHandler.Add(Visit(exp), type.GetText());
+        //        Visit(context.block());
+        //    }
+        //    else if (type == null)
+        //    {
+        //        if (IsTrue(Visit(exp)))
+        //        {
+        //            Visit(context.block());
+        //        }
+        //    }
 
 
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-            
+        //    if (context.elseIfBlock() != null)
+        //    {
+        //        CommandAttribute.IsContainElse = true;
+        //        Visit(context.elseIfBlock());
+        //    }
 
-            IfConditionHandler.Remove(currentNum);
 
-            return null;
-        }
+        //    IfConditionHandler.Remove(currentNum);
+
+        //    return null;
+        //}
 
 
 
@@ -238,29 +242,41 @@ namespace MCFBuilder
         {
             if (context.SELECTOR() != null)
                 return context.SELECTOR().GetText();
-            else if ((context.STRING() != null))
-                return context.STRING().GetText()[1..^1];
-            else if (context.IDENTIFIER() != null)
-            {
-                var varName = context.IDENTIFIER().GetText();
+            //else if (context.STRING() != null)
+            //    return context.STRING().GetText()[1..^1];
+            //else if (context.IDENTIFIER() != null)
+            //{
+            //    var varName = context.IDENTIFIER().GetText();
 
-                if (Variables.ContainsKey(varName))
+            //    if (Variables.ContainsKey(varName))
+            //    {
+            //        if (Variables[varName] is string)
+            //            return Variables[varName];
+            //        else
+            //            throw new InvalidOperationException($"'{varName}' must be a string");
+            //    }
+            //    else if (ProgramVariables.GlobalVariables.ContainsKey(varName))
+            //    {
+            //        if (ProgramVariables.GlobalVariables[varName] is string)
+            //            return ProgramVariables.GlobalVariables[varName];
+            //        else
+            //            throw new InvalidOperationException($"'{varName}' must be a string");
+            //    }
+            //    else
+            //    {
+            //        throw new NotImplementedException();
+            //    }
+            //}
+            else if (context.expression() != null)
+            {
+                var value = Visit(context.expression());
+                if (value is string s)
                 {
-                    if (Variables[varName] is string)
-                        return Variables[varName];
-                    else
-                        throw new InvalidOperationException($"'{varName}' must be a string");
-                }
-                else if (ProgramVariables.GlobalVariables.ContainsKey(varName))
-                {
-                    if (ProgramVariables.GlobalVariables[varName] is string)
-                        return ProgramVariables.GlobalVariables[varName];
-                    else
-                        throw new InvalidOperationException($"'{varName}' must be a string");
+                    return s[1..^1];
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return value.ToString();
                 }
             }
             else
@@ -302,7 +318,7 @@ namespace MCFBuilder
             return base.VisitProgram(context);
         }
 
-        public void GlobalAssignment([NotNull] MCFBuilderParser.ProgramContext context)
+        public async Task GlobalAssignment([NotNull] MCFBuilderParser.ProgramContext context)
         {
             var lines = context.line();
 
@@ -310,15 +326,39 @@ namespace MCFBuilder
             FunctionCompiler.Lines.Lines = new() { "scoreboard objectives add .number dummy" };
             FunctionCompiler.Lines.FilePath = currentFile;
 
+            //TODO: make it faster
             foreach (var line in lines)
             {
-                if (line.ToStringTree().Contains("global"))
+                bool variableMatch = false;
+                foreach (var variable in ProgramVariables.GlobalVariables)
+                {
+                    Regex regex = new Regex($@"\b{variable.Key}\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    var results = regex.Matches(line.GetText());
+                    if (results.Count > 0)
+                    {
+                        variableMatch = true;
+                    }
+                }
+
+                if (line.ToStringTree().Contains("global") || variableMatch)
                 {
                     Visit(line);
                 }
             }
-            
-            File.WriteAllText("load.mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
+
+            Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/load.mcfunction:\n{string.Join('\n', FunctionCompiler.Lines.Lines)}");
+            await File.WriteAllTextAsync($"{Execute.Namespace}/data/{Execute.Namespace}/functions/load.mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
+        }
+
+        public override object? VisitVector([NotNull] MCFBuilderParser.VectorContext context)
+        {
+            var num1 = context.expression(0) != null ? Visit(context.expression(0)) : null;
+            var num2 = context.expression(1) != null ? Visit(context.expression(1)) : null;
+            var num3 = context.expression(2) != null ? Visit(context.expression(2)) : null;
+
+
+
+            return $"~{num1} ~{num2} ~{num3}";
         }
     }
 }

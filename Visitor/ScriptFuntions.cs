@@ -59,50 +59,66 @@ namespace MCFBuilder
             var name = context.IDENTIFIER(0).GetText();
             var args = context.expression().Select(Visit).ToArray();
             var name2 = context.IDENTIFIER(1);
-            
+
             if (name2 == null)
-            if (ProgramVariables.GlobalVariables.ContainsKey(name))
             {
-                if (!ProgramVariables.GlobalVariables.ContainsKey(name))
-                    throw new Exception($"'{name}' is not defined");
-
-                if (ProgramVariables.GlobalVariables[name] is not Func<object?[], object?> func)
-                    throw new Exception($"Variables {name} is not a function");
-
-                return func(args);
-            }
-            else if (Variables.ContainsKey(name))
-            {
-                if (!Variables.ContainsKey(name))
-                    throw new Exception($"'{name}' is not defined");
-
-                if (Variables[name] is not Func<object?[], object?> func)
-                    throw new Exception($"Variables {name} is not a function");
-
-                if (!ProgramVariables.BuiltInFunctions.Contains(name))
+                if (ProgramVariables.GlobalVariables.ContainsKey(name))
                 {
-                    if (args.Length == 0)
-                    {
-                        tempVariables = new Dictionary<string, List<string>>() { [name] = new() };
-                    }
-                    for (int i = 0; i < args.Length; i++)
-                    {
-                        var variables = functionVariables[name];
-                        functionVariables[name][variables.ElementAt(i).Key] = args[i];
-                        tempVariables = new Dictionary<string, List<string>> { [name] = (from v in variables select v.Key).ToList() };
-                    }
+                    if (!ProgramVariables.GlobalVariables.ContainsKey(name))
+                        throw new Exception($"'{name}' is not defined");
+
+                    if (ProgramVariables.GlobalVariables[name] is not Func<object?[], object?> func)
+                        throw new Exception($"Variables {name} is not a function");
+
+                    return func(args);
                 }
-                return func(args);
-            }
-            else
-            {
-                throw new ArgumentException($"{name} is not existed");
+                else if (Variables.ContainsKey(name))
+                {
+                    if (!Variables.ContainsKey(name))
+                        throw new Exception($"'{name}' is not defined");
+
+                    if (Variables[name] is not Func<object?[], object?> func)
+                        throw new Exception($"Variables {name} is not a function");
+
+                    if (!ProgramVariables.BuiltInFunctions.Contains(name))
+                    {
+                        if (args.Length == 0)
+                        {
+                            tempVariables = new Dictionary<string, List<string>>() { [name] = new() };
+                        }
+                        for (int i = 0; i < args.Length; i++)
+                        {
+                            var variables = functionVariables[name];
+                            functionVariables[name][variables.ElementAt(i).Key] = args[i];
+                            tempVariables = new Dictionary<string, List<string>> { [name] = (from v in variables select v.Key).ToList() };
+                        }
+                    }
+                    return func(args);
+                }
+                else
+                {
+                    throw new ArgumentException($"{name} is not existed");
+                }
             }
             else
             {
                 if (Variables.ContainsKey(name))
                 {
                     var _class = (BuiltInClass?)Variables[context.IDENTIFIER(0).GetText()];
+
+                    var method = _class.Methods.FirstOrDefault(v => v.Name == name2.GetText());
+
+                    if (method.Func == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
+                    return method.Func.Invoke(args);
+
+                }
+                else if (ProgramVariables.GlobalVariables.ContainsKey(name))
+                {
+                    var _class = (BuiltInClass?)ProgramVariables.GlobalVariables[context.IDENTIFIER(0).GetText()];
 
                     var method = _class.Methods.FirstOrDefault(v => v.Name == name2.GetText());
 
@@ -129,10 +145,15 @@ namespace MCFBuilder
         public override object? VisitCreateClassExpression(MCFBuilderParser.CreateClassExpressionContext context)
         {
             var className = context.createClass().IDENTIFIER().GetText();
+            var values = context.createClass().expression().Select(Visit).ToArray();
+
             if (ProgramVariables.BuiltInClasses.Where(v => v.Key == className).Any())
             {
                 System.Type type = ProgramVariables.BuiltInClasses.Where(v => v.Key == className).FirstOrDefault().Value;
-                return Activator.CreateInstance(typeof(Selector));
+
+                var _class = Activator.CreateInstance(type, values);
+                Variables.Add(className, _class);
+                return _class;
             }
 
             throw new NotImplementedException();
