@@ -14,12 +14,14 @@ namespace MCFBuilder.Type
         public Coordinates Coordinates { get; set; }
         public Distance Distance { get; set; }
         public string Selector { get; set; }
+        public VolumeDimensions VolumeDimensions { get; set; }
 
-        public SelectorArgs(Coordinates coordinates, Distance distance, string selector)
+        public SelectorArgs(Coordinates coordinates, Distance distance, string selector, VolumeDimensions volumeDimensions)
         {
             Coordinates = coordinates;
             Distance = distance;
             Selector = selector;
+            VolumeDimensions = volumeDimensions;
         }
     }
 }

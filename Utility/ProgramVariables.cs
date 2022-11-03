@@ -28,7 +28,7 @@ namespace MCFBuilder.Utility
         public static List<Scoreboard> ScoreboardObjects { get; } = new();
         public static List<TagsType> Tags { get; } = new();
 
-        private static Dictionary<string, object?> VariablesInit()
+        public static Dictionary<string, object?> VariablesInit()
         {
             var variables = new Dictionary<string, object?>();
 

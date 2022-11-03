@@ -20,13 +20,13 @@ namespace MCFBuilder.Visitor.BuiltInFuntions
             return null;
         }
 
-        public static async Task<object?> LoadFile(object?[] arg)
+        public static object? LoadFile(object?[] arg)
         {
             string? result = null;
             if (arg != null)
             {
                 result = File.ReadAllText(arg[0].ToString());
-                Console.WriteLine(await CSharpScript.EvaluateAsync(result));
+                
             }
             return result;
         }

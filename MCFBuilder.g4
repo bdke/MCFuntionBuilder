@@ -92,6 +92,7 @@ expression
     | expression addOp expression   #additiveExpression
     | expression compareOp expression #comparisionExpression
     | expression boolOp expression #booleanExpression
+    | SELECTOR #selectorExpressionInExpression
 ;
 
 

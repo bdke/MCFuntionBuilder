@@ -6,7 +6,7 @@ namespace MCFBuilder.Utility.BuiltIn
 {
     public class Selector : BuiltInClass
     {
-        private string? _value = null;
+        public string? _value = null;
         public string? Value
         {
             get
@@ -27,8 +27,15 @@ namespace MCFBuilder.Utility.BuiltIn
 
                 var distance = string.Join("..", new string[] { minDis, maxDis }.Where(v => v != string.Empty));
 
+                //Volume Dimensions
+                var dx = (selectorArgs.VolumeDimensions.X != null) ? $"dx={selectorArgs.VolumeDimensions.X}" : "";
+                var dy = (selectorArgs.VolumeDimensions.Y != null) ? $"dy={selectorArgs.VolumeDimensions.Y}" : "";
+                var dz = (selectorArgs.VolumeDimensions.Z != null) ? $"dz={selectorArgs.VolumeDimensions.Z}" : "";
+
+                var volumeDimensions = string.Join(',', new string[] { dx, dy, dz }.Where(v => v != string.Empty));
+
                 //Output
-                _value = $"{selector}[{string.Join(',', new string[] { coordinate, distance }.Where(v => v != string.Empty))}]";
+                _value = $"{selector}[{string.Join(',', new string[] { coordinate, distance, volumeDimensions }.Where(v => v != string.Empty))}]";
 
                 return _value;
             }
@@ -36,22 +43,20 @@ namespace MCFBuilder.Utility.BuiltIn
         }
         private SelectorArgs selectorArgs = new();
 
-        public Selector(string? value) : base(nameof(Selector))
+        public Selector(string? value) : base(typeof(Selector))
         {
-            Value = value;
-            Methods.Add(new MethodInfo() { Name = nameof(SetCoordinate), Func = SetCoordinate});
-            Methods.Add(new MethodInfo() { Name = nameof(SetDistance), Func = SetDistance });
-            Methods.Add(new MethodInfo() { Name = nameof(SetSelector), Func = SetSelector });
+            selectorArgs.Selector = value;
+
         }
 
-        public Selector() : base(nameof(Selector))
+        public Selector() : base(typeof(Selector))
         {
-            Methods.Add(new MethodInfo() { Name = nameof(SetCoordinate), Func = SetCoordinate });
-            Methods.Add(new MethodInfo() { Name = nameof(SetDistance), Func = SetDistance });
-            Methods.Add(new MethodInfo() { Name = nameof(SetSelector), Func = SetSelector });
+
         }
 
-        private object? SetSelector(object?[]? args)
+
+        //Set things
+        public object? SetSelector(object?[]? args)
         {
             if (args != null && args.Length == 1)
             {
@@ -62,9 +67,8 @@ namespace MCFBuilder.Utility.BuiltIn
         }
 
         
-        private object? SetCoordinate(object?[]? args)
+        public object? SetCoordinate(object?[]? args)
         {
-            //args.Coordinates = new(x, y, z);
             if (args != null && args.Length == 3)
             {
                 selectorArgs.Coordinates = new(
@@ -76,9 +80,8 @@ namespace MCFBuilder.Utility.BuiltIn
             return null;
         }
 
-        private object? SetDistance(object?[]? args)
+        public object? SetDistance(object?[]? args)
         {
-            //args.Distance = new(min, max);
             if (args != null && args.Length == 2)
             {
                 selectorArgs.Distance = new(
@@ -89,6 +92,24 @@ namespace MCFBuilder.Utility.BuiltIn
             return null;
         }
 
+        public object? SetVolumeDistance(object?[]? args)
+        {
+            if (args != null && args.Length == 3)
+            {
+                selectorArgs.Coordinates = new(
+                    (args[0] != null) ? double.Parse(args[0].ToString()) : null,
+                    (args[1] != null) ? double.Parse(args[1].ToString()) : null,
+                    (args[2] != null) ? double.Parse(args[2].ToString()) : null
+                    );
+            }
+
+            return null;
+        }
+
+
+
+
+        //default things
         public override object? GetValue(string name)
         {
             return name switch

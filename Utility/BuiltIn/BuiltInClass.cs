@@ -11,25 +11,33 @@ namespace MCFBuilder.Utility.BuiltIn
     public abstract class BuiltInClass
     {
         public string Name { get; }
-        public List<MethodInfo> Methods { get; } = new();
+        public List<ClassMethodInfos> Methods { get; } = new();
 
-        public BuiltInClass(string name)
+        public BuiltInClass(System.Type type)
         {
-            Name = name;
+            Name = type.Name;
+            var methods = type.GetMethods(BindingFlags.Public);
+            if (methods.Any())
+            {
+                foreach (var method in methods)
+                {
+
+                }
+            }
         }
 
         public object? InvokeMethod(string name ,object?[] args)
         {
-            return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(args);
+            return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(this,args);
         }
 
         public abstract object? GetValue(string name);
         public abstract void SetValue(string name, object? value);
 
-        public struct MethodInfo
+        public struct ClassMethodInfos
         {
             public string Name { get; set; }
-            public Func<object?[]?, object?> Func { get; set; }
+            public MethodInfo Func { get; set; }
         }
     }
 }

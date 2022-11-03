@@ -33,6 +33,8 @@ namespace MCFBuilder.Type
             {
                 case "dummy":
                     return ScoreboardTypes.Dummy;
+                case "health":
+                    return ScoreboardTypes.Health;
                 default:
                     throw new NotImplementedException();
             }
@@ -44,6 +46,8 @@ namespace MCFBuilder.Type
             {
                 case ScoreboardTypes.Dummy:
                     return "dummy";
+                case ScoreboardTypes.Health:
+                    return "health";
                 default:
                     throw new NotImplementedException();
             }

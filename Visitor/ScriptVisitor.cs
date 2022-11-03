@@ -30,7 +30,7 @@ namespace MCFBuilder
             }
         }
 
-        Dictionary<string, object?> Variables { get; } = new();
+        Dictionary<string, object?> Variables { get; set; } = new();
         Dictionary<string, Dictionary<string, object?>> functionVariables { get; set; } = new();
         Dictionary<string,List<string>> tempVariables = new();
         List<Scoreboard> scoreboards = new();
@@ -66,6 +66,7 @@ namespace MCFBuilder
             FunctionCompiler.Lines.Lines = new();
             FunctionCompiler.Lines.FilePath = currentFile;
             Variables.Clear();
+            Variables = ProgramVariables.VariablesInit();
             tempVariables.Clear();
             functionVariables.Clear();
             scoreboards.Clear();
@@ -332,7 +333,7 @@ namespace MCFBuilder
                 bool variableMatch = false;
                 foreach (var variable in ProgramVariables.GlobalVariables)
                 {
-                    Regex regex = new Regex($@"\b{variable.Key}\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    Regex regex = new Regex($@"\b{variable.Key}\.\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
                     var results = regex.Matches(line.GetText());
                     if (results.Count > 0)
                     {
@@ -359,6 +360,11 @@ namespace MCFBuilder
 
 
             return $"~{num1} ~{num2} ~{num3}";
+        }
+
+        public override object? VisitSelectorExpressionInExpression([NotNull] MCFBuilderParser.SelectorExpressionInExpressionContext context)
+        {
+            return context.SELECTOR().GetText();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace MCFBuilder.Utility.BuiltIn
 {
     public class Function : BuiltInClass
     {
-        public Function() : base(nameof(Function))
+        public Function() : base(typeof(Function))
         {
 
         }

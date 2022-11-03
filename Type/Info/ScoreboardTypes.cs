@@ -8,6 +8,7 @@ namespace MCFBuilder.Type.Info
 {
     public enum ScoreboardTypes
     {
-        Dummy
+        Dummy,
+        Health
     }
 }
