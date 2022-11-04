@@ -27,7 +27,10 @@ executeTypes
             | ('at' selector) #ExecuteAtExpression
             | ('positioned' (('as' selector) | (vector))) #ExeuctePositionedExpression
             ;
-vector: '~' expression? '~' expression? '~' expression? ;
+vector
+    : '~' expression? '~' expression? '~' expression? #ExactVectorExpression
+    | '^' expression? '^' expression? '^' expression? #RelativeVectorExpression
+    ;
 
 elseIfBlock: block | ifBlock;
 
@@ -59,7 +62,7 @@ globalTagsAssignment: 'tag' 'global' IDENTIFIER (selector '=' BOOL)? ;
 globalAssignment: 'global' IDENTIFIER ('=' expression)? ;
 globalScoresAssignment: 'score' 'global' IDENTIFIER (selector '=' expression)?;
 
-operation: IDENTIFIER selector? assignOp expression ;
+operation: expression selector? assignOp expression ;
 // scoresOperation: 'score' IDENTIFIER selector assignOp expression ;
 // tagsOperation: 'tag' IDENTIFIER selector '=' BOOL ;
 

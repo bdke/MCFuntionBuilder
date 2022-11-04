@@ -35,7 +35,6 @@ namespace MCFBuilder.Utility.BuiltIn
             return null;
         }
 
-
         //TODO return a .mcfunction file object
         public static object? Create(object?[]? args)
         {
@@ -44,19 +43,6 @@ namespace MCFBuilder.Utility.BuiltIn
                 File.Create($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + (string?)args[0] + ".mcfunction");
             }
             return null;
-        }
-
-        public override object? GetValue(string name)
-        {
-            return name switch
-            {
-                _ => throw new NotImplementedException()
-            };
-        }
-
-        public override void SetValue(string name, object? value)
-        {
-            throw new NotImplementedException();
         }
     }
 }

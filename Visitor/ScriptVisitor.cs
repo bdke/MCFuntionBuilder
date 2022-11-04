@@ -351,7 +351,7 @@ namespace MCFBuilder
             await File.WriteAllTextAsync($"{Execute.Namespace}/data/{Execute.Namespace}/functions/load.mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));
         }
 
-        public override object? VisitVector([NotNull] MCFBuilderParser.VectorContext context)
+        public override object? VisitExactVectorExpression([NotNull] MCFBuilderParser.ExactVectorExpressionContext context)
         {
             var num1 = context.expression(0) != null ? Visit(context.expression(0)) : null;
             var num2 = context.expression(1) != null ? Visit(context.expression(1)) : null;
@@ -360,6 +360,17 @@ namespace MCFBuilder
 
 
             return $"~{num1} ~{num2} ~{num3}";
+        }
+
+        public override object? VisitRelativeVectorExpression([NotNull] MCFBuilderParser.RelativeVectorExpressionContext context)
+        {
+            var num1 = context.expression(0) != null ? Visit(context.expression(0)) : null;
+            var num2 = context.expression(1) != null ? Visit(context.expression(1)) : null;
+            var num3 = context.expression(2) != null ? Visit(context.expression(2)) : null;
+
+
+
+            return $"^{num1} ^{num2} ^{num3}";
         }
 
         public override object? VisitSelectorExpressionInExpression([NotNull] MCFBuilderParser.SelectorExpressionInExpressionContext context)

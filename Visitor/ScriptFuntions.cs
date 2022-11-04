@@ -113,7 +113,7 @@ namespace MCFBuilder
                         throw new InvalidOperationException();
                     }
 
-                    return method.Func.Invoke(_class,args);
+                    return method.Func.Invoke(_class,new object[] { args });
 
                 }
                 else if (ProgramVariables.GlobalVariables.ContainsKey(name))
@@ -127,7 +127,7 @@ namespace MCFBuilder
                         throw new InvalidOperationException();
                     }
 
-                    return method.Func.Invoke(_class, args);
+                    return method.Func.Invoke(_class, new object[] { args });
 
                 }
                 else if (ProgramVariables.BuiltInClasses.ContainsKey(name))

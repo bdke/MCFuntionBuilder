@@ -92,10 +92,11 @@ namespace MCFBuilder
 
         public override object? VisitOperation(MCFBuilderParser.OperationContext context)
         {
-            var varName = context.IDENTIFIER().GetText();
+            var varName = context.expression(0).GetText();
             var assignOp = context.assignOp().GetText();
             var selector = context.selector();
-            var exp = context.expression();
+            var exp = context.expression(1);
+            var varValue = Visit(context.expression(0));
             if (!CheckExists(varName))
                 throw new InvalidOperationException($"'{varName}' is not existed");
 
@@ -104,11 +105,11 @@ namespace MCFBuilder
             //normal variables
             if (Variables.ContainsKey(varName))
             {
-                Variables[varName] = AssignmentHelper.AssignOp(assignOp,(int?)Visit(context.IDENTIFIER()),(int?)Visit(context.expression()));
+                Variables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)varValue,(int?)Visit(context.expression(1)));
             }
             else if (ProgramVariables.GlobalVariables.ContainsKey(varName))
             {
-                ProgramVariables.GlobalVariables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)Visit(context.IDENTIFIER()), (int?)Visit(context.expression()));
+                ProgramVariables.GlobalVariables[varName] = AssignmentHelper.AssignOp(assignOp, (int?)varValue, (int?)varValue);
             }
 
             //tags variables

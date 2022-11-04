@@ -106,33 +106,50 @@ namespace MCFBuilder.Utility.BuiltIn
             return null;
         }
 
-
-
-
-        //default things
-        public override object? GetValue(string name)
+        public object? GiveEffect(object?[]? args)
         {
-            return name switch
+            if (args != null && args.Length == 1)
             {
-                nameof(Value) => Value,
-                _ => throw new ArgumentException()
-            };
-        }
-
-        public override void SetValue(string name, object? value)
-        {
-            switch (name)
-            {
-                case nameof(Value):
-                    if (value is string s)
-                    {
-                        Value = s;
-                    }
-                    break;
-                default:
-                    throw new ArgumentException();
+                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]}");
             }
+            else if (args != null && args.Length == 2)
+            {
+                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]} {args[1]}");
+            }
+            else if (args != null && args.Length == 3)
+            {
+                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]} {args[1]} {args[2]}");
+            }
+
+
+            return null;
         }
+
+
+        ////default things
+        //public override object? GetValue(string name)
+        //{
+        //    return name switch
+        //    {
+        //        nameof(Value) => Value,
+        //        _ => throw new ArgumentException()
+        //    };
+        //}
+
+        //public override void SetValue(string name, object? value)
+        //{
+        //    switch (name)
+        //    {
+        //        case nameof(Value):
+        //            if (value is string s)
+        //            {
+        //                Value = s;
+        //            }
+        //            break;
+        //        default:
+        //            throw new ArgumentException();
+        //    }
+        //}
 
         public override string? ToString()
         {

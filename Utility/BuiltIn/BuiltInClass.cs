@@ -16,12 +16,12 @@ namespace MCFBuilder.Utility.BuiltIn
         public BuiltInClass(System.Type type)
         {
             Name = type.Name;
-            var methods = type.GetMethods(BindingFlags.Public);
+            var methods = type.GetMethods();
             if (methods.Any())
             {
                 foreach (var method in methods)
                 {
-
+                    Methods.Add(new() { Name = method.Name, Func = method});
                 }
             }
         }
@@ -31,13 +31,37 @@ namespace MCFBuilder.Utility.BuiltIn
             return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(this,args);
         }
 
-        public abstract object? GetValue(string name);
-        public abstract void SetValue(string name, object? value);
+        public object? GetValue(string name)
+        {
+            var props = GetType().GetProperty(name);
+
+            if (props != null)
+            {
+                return props.GetValue(this, null);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+        }
+        public void SetValue(string name, object? value)
+        {
+            var props = GetType().GetProperty(name);
+
+            if (props != null)
+            {
+                props.SetValue(this, value);
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+        }
 
         public struct ClassMethodInfos
         {
             public string Name { get; set; }
-            public MethodInfo Func { get; set; }
+            public MethodInfo? Func { get; set; }
         }
     }
 }
