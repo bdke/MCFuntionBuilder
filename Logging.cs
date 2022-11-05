@@ -34,19 +34,19 @@ namespace MCFBuilder
             Log.Information("Logger setup successfully");
         }
 
-        public static void Info(string message)
+        public static void Info(object message)
         {
-            Log.Information(message);
+            Log.Information(message.ToString());
         }
 
-        public static void Debug(string message)
+        public static void Debug(object message)
         {
-            Log.Debug(message);
+            Log.Debug(message.ToString());
         }
 
-        public static void Trace(string message)
+        public static void Trace(object message)
         {
-            Log.Verbose(message);
+            Log.Verbose(message.ToString());
         }
 
         public static void Error(ErrorType errorType, object message)

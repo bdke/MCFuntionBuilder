@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using MCFBuilder.Type;
-using MCFBuilder.Utility.BuiltIn;
+using MCFBuilder.Utility.BuiltIn.Class;
 
 namespace MCFBuilder
 {
@@ -168,6 +168,11 @@ namespace MCFBuilder
             {
                 return _class.GetValue(name);
             }
+            else if (ProgramVariables.BuiltInClasses.ContainsKey(context.classVariables().IDENTIFIER(0).GetText()))
+            {
+                return ProgramVariables.BuiltInClasses[context.classVariables().IDENTIFIER(0).GetText()]
+                    .GetField(context.classVariables().IDENTIFIER(1).GetText()).GetValue(null);
+            }
 
             return null;
         }
@@ -177,6 +182,10 @@ namespace MCFBuilder
             if (Variables.ContainsKey(context.IDENTIFIER()[0].GetText()))
             {
                 return Variables[context.IDENTIFIER()[0].GetText()];
+            }
+            else if (ProgramVariables.GlobalVariables.ContainsKey(context.IDENTIFIER()[0].GetText()))
+            {
+                return ProgramVariables.GlobalVariables[context.IDENTIFIER()[0].GetText()];
             }
 
             return null;

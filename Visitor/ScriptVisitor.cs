@@ -62,6 +62,19 @@ namespace MCFBuilder
         {
             FunctionEndAction();
             currentFile = context.GetText()[1..];
+            FunctionCompiler.FileType = FileType.DEFAULT;
+            if (currentFile.Contains(':'))
+            {
+                var type = currentFile.Split(':')[1];
+                switch (type)
+                {
+                    case "temp":
+                        FunctionCompiler.FileType = FileType.TEMP;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
             FunctionCompiler.Lines = new();
             FunctionCompiler.Lines.Lines = new();
             FunctionCompiler.Lines.FilePath = currentFile;
@@ -91,7 +104,7 @@ namespace MCFBuilder
                 }
                 
             }
-            if (currentFile != null)
+            if (currentFile != null && FunctionCompiler.FileType == FileType.DEFAULT)
             {
                 Logging.Debug($"{Execute.Namespace}/data/{Execute.Namespace}/functions/{currentFile}.mcfunction:\n{string.Join('\n', FunctionCompiler.Lines.Lines)}");
                 File.WriteAllText($"{Execute.Namespace}/data/{Execute.Namespace}/functions/" + currentFile + ".mcfunction", string.Join('\n', FunctionCompiler.Lines.Lines));

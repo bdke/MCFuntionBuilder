@@ -1,4 +1,4 @@
-﻿using MCFBuilder.Utility.BuiltIn;
+﻿using MCFBuilder.Utility.BuiltIn.Class;
 using System;
 using System.Collections.Generic;
 using System.Linq;

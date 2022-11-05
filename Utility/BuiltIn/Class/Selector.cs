@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace MCFBuilder.Utility.BuiltIn
+namespace MCFBuilder.Utility.BuiltIn.Class
 {
     public class Selector : BuiltInClass
     {
@@ -12,25 +12,25 @@ namespace MCFBuilder.Utility.BuiltIn
             get
             {
                 //Selector
-                var selector = (selectorArgs.Selector != null) ? selectorArgs.Selector : throw new NotImplementedException();
+                var selector = selectorArgs.Selector != null ? selectorArgs.Selector : throw new NotImplementedException();
 
                 //Coordinate
-                var coorX = (selectorArgs.Coordinates.X != null) ? $"x={selectorArgs.Coordinates.X}" : "";
-                var coorY = (selectorArgs.Coordinates.Y != null) ? $"y={selectorArgs.Coordinates.Y}" : "";
-                var coorZ = (selectorArgs.Coordinates.Z != null) ? $"z={selectorArgs.Coordinates.Z}" : "";
+                var coorX = selectorArgs.Coordinates.X != null ? $"x={selectorArgs.Coordinates.X}" : "";
+                var coorY = selectorArgs.Coordinates.Y != null ? $"y={selectorArgs.Coordinates.Y}" : "";
+                var coorZ = selectorArgs.Coordinates.Z != null ? $"z={selectorArgs.Coordinates.Z}" : "";
 
-                var coordinate = string.Join(',',new string[] { coorX, coorY, coorZ }.Where(v => v != string.Empty));
+                var coordinate = string.Join(',', new string[] { coorX, coorY, coorZ }.Where(v => v != string.Empty));
 
                 //Distance
-                var minDis = (selectorArgs.Distance.Min != null) ? $"{selectorArgs.Distance.Min}" : "";
-                var maxDis = (selectorArgs.Distance.Max != null) ? $"{selectorArgs.Distance.Max}" : "";
+                var minDis = selectorArgs.Distance.Min != null ? $"{selectorArgs.Distance.Min}" : "";
+                var maxDis = selectorArgs.Distance.Max != null ? $"{selectorArgs.Distance.Max}" : "";
 
                 var distance = string.Join("..", new string[] { minDis, maxDis }.Where(v => v != string.Empty));
 
                 //Volume Dimensions
-                var dx = (selectorArgs.VolumeDimensions.X != null) ? $"dx={selectorArgs.VolumeDimensions.X}" : "";
-                var dy = (selectorArgs.VolumeDimensions.Y != null) ? $"dy={selectorArgs.VolumeDimensions.Y}" : "";
-                var dz = (selectorArgs.VolumeDimensions.Z != null) ? $"dz={selectorArgs.VolumeDimensions.Z}" : "";
+                var dx = selectorArgs.VolumeDimensions.X != null ? $"dx={selectorArgs.VolumeDimensions.X}" : "";
+                var dy = selectorArgs.VolumeDimensions.Y != null ? $"dy={selectorArgs.VolumeDimensions.Y}" : "";
+                var dz = selectorArgs.VolumeDimensions.Z != null ? $"dz={selectorArgs.VolumeDimensions.Z}" : "";
 
                 var volumeDimensions = string.Join(',', new string[] { dx, dy, dz }.Where(v => v != string.Empty));
 
@@ -39,7 +39,7 @@ namespace MCFBuilder.Utility.BuiltIn
 
                 return _value;
             }
-            set => _value = value; 
+            set => _value = value;
         }
         private SelectorArgs selectorArgs = new();
 
@@ -66,15 +66,15 @@ namespace MCFBuilder.Utility.BuiltIn
             return null;
         }
 
-        
+
         public object? SetCoordinate(object?[]? args)
         {
             if (args != null && args.Length == 3)
             {
                 selectorArgs.Coordinates = new(
-                    (args[0] != null) ? double.Parse(args[0].ToString()) : null,
-                    (args[1] != null) ? double.Parse(args[1].ToString()) : null,
-                    (args[2] != null) ? double.Parse(args[2].ToString()) : null
+                    args[0] != null ? double.Parse(args[0].ToString()) : null,
+                    args[1] != null ? double.Parse(args[1].ToString()) : null,
+                    args[2] != null ? double.Parse(args[2].ToString()) : null
                     );
             }
             return null;
@@ -97,9 +97,9 @@ namespace MCFBuilder.Utility.BuiltIn
             if (args != null && args.Length == 3)
             {
                 selectorArgs.Coordinates = new(
-                    (args[0] != null) ? double.Parse(args[0].ToString()) : null,
-                    (args[1] != null) ? double.Parse(args[1].ToString()) : null,
-                    (args[2] != null) ? double.Parse(args[2].ToString()) : null
+                    args[0] != null ? double.Parse(args[0].ToString()) : null,
+                    args[1] != null ? double.Parse(args[1].ToString()) : null,
+                    args[2] != null ? double.Parse(args[2].ToString()) : null
                     );
             }
 

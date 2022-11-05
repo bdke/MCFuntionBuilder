@@ -7,8 +7,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using MCFBuilder.Utility.BuiltIn;
-using Selector = MCFBuilder.Utility.BuiltIn.Selector;
+using Selector = MCFBuilder.Utility.BuiltIn.Class.Selector;
+using MCFBuilder.Utility.BuiltIn.Class;
+using MCFBuilder.Utility.BuiltIn.Enum;
 
 namespace MCFBuilder.Utility
 {
@@ -22,6 +23,7 @@ namespace MCFBuilder.Utility
         {
             [nameof(Selector)] = typeof(Selector),
             [nameof(Function)] = typeof(Function),
+            [nameof(EffectTypes)] = typeof(EffectTypes),
         };
 
         public static Dictionary<string, object?> GlobalVariables { get; } = VariablesInit();

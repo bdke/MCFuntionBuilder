@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCFBuilder.Utility.BuiltIn
+namespace MCFBuilder.Utility.BuiltIn.Class
 {
     public abstract class BuiltInClass
     {
@@ -21,14 +21,14 @@ namespace MCFBuilder.Utility.BuiltIn
             {
                 foreach (var method in methods)
                 {
-                    Methods.Add(new() { Name = method.Name, Func = method});
+                    Methods.Add(new() { Name = method.Name, Func = method });
                 }
             }
         }
 
-        public object? InvokeMethod(string name ,object?[] args)
+        public object? InvokeMethod(string name, object?[] args)
         {
-            return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(this,args);
+            return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(this, args);
         }
 
         public object? GetValue(string name)

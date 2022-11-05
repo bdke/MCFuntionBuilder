@@ -15,9 +15,16 @@ namespace MCFBuilder.Utility
         public List<string?> Lines { get; set; }
     }
 
+    public enum FileType
+    {
+        DEFAULT,
+        TEMP
+    }
+    
     public static class FunctionCompiler
     {
         public static ProgramLines Lines = new();
+        public static FileType FileType = FileType.DEFAULT;
     }
 
     public class Scoreboard

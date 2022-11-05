@@ -14,6 +14,7 @@ using MethodTimer;
 using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using Antlr4.Runtime.Misc;
+using MCFBuilder.MCData;
 
 namespace MCFBuilder
 {
@@ -63,6 +64,9 @@ namespace MCFBuilder
         [Time("Application finished...")]
         public static async Task<int> Main(string[] args)
         {
+            //Init
+            EffectsDatas.Init();
+
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith("--") || args[i].StartsWith("-"))

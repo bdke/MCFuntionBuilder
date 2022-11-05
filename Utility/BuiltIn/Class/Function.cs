@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MCFBuilder.Type.Compiler;
 
-namespace MCFBuilder.Utility.BuiltIn
+namespace MCFBuilder.Utility.BuiltIn.Class
 {
     public class Function : BuiltInClass
     {
