@@ -8,17 +8,21 @@ line: assignFunction | statement | ifBlock | executeBlock | whileBlock | forBloc
 statement: (assignment | functionCall | return | global) SEMI;
 
 ifBlock
-    : 'if' '(' expression ')' block ('else' elseIfBlock)? #IfStandardExpression
-    | 'if' 'entity' '(' selector ')' block ('else' elseIfBlock)? #IfEntityExpression
-    | 'if' 'score' '(' IDENTIFIER selector compareOp expression ')' block ('else' elseIfBlock)? #IfScoreMatchesCompareExpression
-    | 'if' 'score' expression ('to' expression)? '(' IDENTIFIER selector ')' block ('else' elseIfBlock)? #IfScoreMatchesExpression
-    | 'if' 'score' '('IDENTIFIER selector compareOp IDENTIFIER selector ')' block ('else' elseIfBlock)? #IfScoreCompareExpression
-    | 'if' 'predicate' '(' expression ',' expression ')' block ('else' elseIfBlock)? #IfPredicateExpression
-    | 'if' 'block' vector '(' expression ')' block ('else' elseIfBlock)? #IfBlockExpression
-    | 'if' 'blocks' vector vector vector IFBLOCKSTYPE block ('else' elseIfBlock)? #IfBlocksExpression
-    | 'if' 'data' 'block' vector expression block ('else' elseIfBlock)? #IfDataBlockExpression
-    | 'if' 'data' 'entity' selector expression block ('else' elseIfBlock)? #IfDataEntityExpression
-    | 'if' 'data' 'storage' expression expression block ('else' elseIfBlock)? #IfDataStorageExpression
+    : 'if' ifConditionalBlock+ block ('else' elseIfBlock)? #ifConditionalExpression
+    | 'if' '(' expression ')' block ('else' elseIfBlock)? #IfStandardExpression
+    ;
+
+ifConditionalBlock
+    : 'entity' '(' selector ')' #IfEntityExpression
+    | 'score' '(' IDENTIFIER selector compareOp expression ')' #IfScoreMatchesCompareExpression
+    | 'score' expression ('to' expression)? '(' IDENTIFIER selector ')' #IfScoreMatchesExpression
+    | 'score' '('IDENTIFIER selector compareOp IDENTIFIER selector ')' #IfScoreCompareExpression
+    | 'predicate' '(' expression ',' expression ')' #IfPredicateExpression
+    | 'block' vector '(' expression ')' #IfBlockExpression
+    | 'blocks' vector vector vector '(' IFBLOCKSTYPE ')' #IfBlocksExpression
+    | 'data' 'block' vector '(' expression ')' #IfDataBlockExpression
+    | 'data' 'entity' selector '(' expression? ')' #IfDataEntityExpression
+    | 'data' 'storage' expression '(' expression ')' #IfDataStorageExpression
     ;
 
 executeBlock: 'execute' (executeTypes)+ block ;

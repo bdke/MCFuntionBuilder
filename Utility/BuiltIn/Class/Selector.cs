@@ -1,6 +1,9 @@
-﻿using MCFBuilder.Type;
+﻿using MCFBuilder.MCData;
+using MCFBuilder.Type;
+using MCFBuilder.Type.Compiler;
 using System;
 using System.Linq;
+using System.Net.WebSockets;
 
 namespace MCFBuilder.Utility.BuiltIn.Class
 {
@@ -96,7 +99,7 @@ namespace MCFBuilder.Utility.BuiltIn.Class
         {
             if (args != null && args.Length == 3)
             {
-                selectorArgs.Coordinates = new(
+                selectorArgs.VolumeDimensions = new(
                     args[0] != null ? double.Parse(args[0].ToString()) : null,
                     args[1] != null ? double.Parse(args[1].ToString()) : null,
                     args[2] != null ? double.Parse(args[2].ToString()) : null
@@ -108,23 +111,17 @@ namespace MCFBuilder.Utility.BuiltIn.Class
 
         public object? GiveEffect(object?[]? args)
         {
-            if (args != null && args.Length == 1)
-            {
-                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]}");
-            }
-            else if (args != null && args.Length == 2)
-            {
-                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]} {args[1]}");
-            }
-            else if (args != null && args.Length == 3)
-            {
-                FunctionCompiler.Lines.Lines.Add($"effect give {Value} {args[0]} {args[1]} {args[2]}");
-            }
-
-
-            return null;
+            var largs = args.ToList();
+            largs.Insert(0, Value);
+            return Effect.Give(largs.ToArray());
         }
 
+        public object? ClearEffect(object?[]? args)
+        {
+            var largs = args.ToList();
+            largs.Insert(0, Value);
+            return Effect.Clear(largs.ToArray());
+        }
 
         ////default things
         //public override object? GetValue(string name)

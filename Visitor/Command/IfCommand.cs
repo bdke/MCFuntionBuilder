@@ -2,6 +2,7 @@
 using MCFBuilder.Type.Compiler;
 using MCFBuilder.Utility;
 using MCFBuilder.Utility.BuiltIn;
+using MCFBuilder.Utility.BuiltIn.Class;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,48 @@ namespace MCFBuilder
 {
     partial class ScriptVisitor
     {
+        public override object? VisitIfConditionalExpression([NotNull] MCFBuilderParser.IfConditionalExpressionContext context)
+        {
+            var blocks = context.ifConditionalBlock().Select(Visit).Select(Convert.ToInt32).Reverse().ToArray();
+            //foreach (var block in blocks)
+            //{
+            //    CommandAttribute.IsContainElse = false;
+            //    int currentNum = block;
+            //    Visit(context.block());
+
+            //    if (context.elseIfBlock() != null)
+            //    {
+            //        CommandAttribute.IsContainElse = true;
+            //        CommandAttribute.Attributes[currentNum].AttributeType = (CommandAttribute.Attributes[currentNum].AttributeType == AttributeType.IF) ? AttributeType.UNLESS : AttributeType.IF;
+            //        Visit(context.elseIfBlock());
+            //    }
+
+            //    IfConditionHandler.Remove(currentNum);
+            //}
+            CommandAttribute.IsContainElse = false;
+            Visit(context.block());
+            foreach (var block in blocks)
+            {
+                if (context.elseIfBlock() != null)
+                {
+                    CommandAttribute.Attributes[block].AttributeType = (CommandAttribute.Attributes[block].AttributeType == AttributeType.IF) ? AttributeType.UNLESS : AttributeType.IF;
+                }
+            }
+            if (context.elseIfBlock() != null)
+            {
+                CommandAttribute.IsContainElse = true;
+                Visit(context.elseIfBlock());
+            }
+
+            foreach (var block in blocks)
+            {
+                IfConditionHandler.Remove(block);
+            }
+
+            return null;
+        }
+
+
         public override object? VisitIfStandardExpression([NotNull] MCFBuilderParser.IfStandardExpressionContext context)
         {
             var exp = Visit(context.expression());
@@ -38,21 +81,7 @@ namespace MCFBuilder
         {
             var selector = Visit(context.selector());
 
-            int? currentNum;
-
-            CommandAttribute.IsContainElse = false;
-            currentNum = IfConditionHandler.Add((string?)selector, "entity");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add((string?)selector, "entity");
         }
 
         public override object? VisitIfScoreMatchesCompareExpression([NotNull] MCFBuilderParser.IfScoreMatchesCompareExpressionContext context)
@@ -61,9 +90,6 @@ namespace MCFBuilder
             var varName = context.IDENTIFIER().GetText();
             var numValue = Visit(context.expression());
             var compareOp = context.compareOp().GetText();
-
-            int? currentNum = null;
-            CommandAttribute.IsContainElse = false;
 
             if (selector[0..2] == "@a")
             {
@@ -76,8 +102,7 @@ namespace MCFBuilder
                 var scoreboard = (from i in value where i.Key == selector select new { Name = i.Key, Value = i.Value }).First();
                 if (numValue is int num)
                 {
-                    currentNum = IfConditionHandler.Add(varName ,scoreboard.Name , compareOp, num);
-                    Visit(context.block());
+                    return IfConditionHandler.Add(varName ,scoreboard.Name , compareOp, num);
                 }
             }
 
@@ -87,18 +112,9 @@ namespace MCFBuilder
                 var scoreboard = (from i in value where i.Key == selector select new { Name = i.Key, Value = i.Value }).First();
                 if (numValue is int num)
                 {
-                    currentNum = IfConditionHandler.Add(varName, scoreboard.Name, compareOp, num);
-                    Visit(context.block());
+                    return IfConditionHandler.Add(varName, scoreboard.Name, compareOp, num);
                 }
             }
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
 
             return null;
         }
@@ -118,28 +134,14 @@ namespace MCFBuilder
             var scbLeft = scoreboards.Where(v => v.ScoreboardValues.Name == varNameLeft).FirstOrDefault();
             var scbRight = scoreboards.Where(v => v.ScoreboardValues.Name == varNameRight).FirstOrDefault();
 
-            int? currentNum = null;
-            CommandAttribute.IsContainElse = false;
-
             if (scbLeft != null && scbRight != null)
             {
                 var valueLeft = (from i in scbLeft.ScoreboardValues.Value where i.Key == selectorLeft select new { Name = i.Key, Value = i.Value }).First();
                 var valueRight = (from i in scbLeft.ScoreboardValues.Value where i.Key == selectorRight select new { Name = i.Key, Value = i.Value }).First();
-                currentNum = IfConditionHandler.Add(varNameLeft, valueLeft.Name, varNameRight, valueRight.Name, compareOp);
-                Visit(context.block());
+                return IfConditionHandler.Add(varNameLeft, valueLeft.Name, varNameRight, valueRight.Name, compareOp);
             }
             else
                 throw new ArgumentException();
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
         }
 
         public override object? VisitIfPredicateExpression([NotNull] MCFBuilderParser.IfPredicateExpressionContext context)
@@ -147,21 +149,7 @@ namespace MCFBuilder
             var _namespace = Visit(context.expression(0));
             var path = Visit(context.expression(1));
 
-            int? currentNum = null;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{_namespace}:{path}", "predicate");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{_namespace}:{path}", "predicate");
         }
 
         public override object? VisitIfBlockExpression([NotNull] MCFBuilderParser.IfBlockExpressionContext context)
@@ -173,21 +161,7 @@ namespace MCFBuilder
                 throw new ArgumentException();
             }
 
-            int? currentNum = null;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{vector} {block}", "block");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{vector} {block}", "block");
         }
 
         public override object? VisitIfBlocksExpression([NotNull] MCFBuilderParser.IfBlocksExpressionContext context)
@@ -196,21 +170,7 @@ namespace MCFBuilder
             var vec2 = Visit(context.vector(1));
             var vec3 = Visit(context.vector(2));
 
-            int? currentNum;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{vec1} {vec2} {vec3} {context.IFBLOCKSTYPE().GetText()}", "blocks");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{vec1} {vec2} {vec3} {context.IFBLOCKSTYPE().GetText()}", "blocks");
         }
 
         public override object? VisitIfDataBlockExpression([NotNull] MCFBuilderParser.IfDataBlockExpressionContext context)
@@ -220,21 +180,7 @@ namespace MCFBuilder
             if (exp is not string)
                 throw new ArgumentException();
 
-            int? currentNum;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{vec} {exp}", "data block");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{vec} {exp}", "data block");
         }
 
         public override object? VisitIfDataEntityExpression([NotNull] MCFBuilderParser.IfDataEntityExpressionContext context)
@@ -244,21 +190,7 @@ namespace MCFBuilder
             if (exp is not string)
                 throw new ArgumentException();
 
-            int? currentNum;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{selector} {exp}", "data entity");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{selector} {exp}", "data entity");
         }
 
         public override object? VisitIfDataStorageExpression([NotNull] MCFBuilderParser.IfDataStorageExpressionContext context)
@@ -268,21 +200,7 @@ namespace MCFBuilder
             if (exp is not string || source is not string)
                 throw new ArgumentException();
 
-            int? currentNum;
-            CommandAttribute.IsContainElse = false;
-
-            currentNum = IfConditionHandler.Add($"{source} {exp}", "data storage");
-            Visit(context.block());
-
-            if (context.elseIfBlock() != null)
-            {
-                CommandAttribute.IsContainElse = true;
-                Visit(context.elseIfBlock());
-            }
-
-            IfConditionHandler.Remove(currentNum);
-
-            return null;
+            return IfConditionHandler.Add($"{source} {exp}", "data storage");
         }
     }
 }

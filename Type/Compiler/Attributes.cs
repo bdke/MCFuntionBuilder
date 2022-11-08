@@ -32,32 +32,32 @@ namespace MCFBuilder.Type.Compiler
 
             var IfCount = IfItem.Count();
             var ic = 0;
-
+            //TODO: debug this :(
             foreach (var attr in Attributes)
             {
                 if (attr.AttributeType == AttributeType.IF)
                 {
-                    ic++;
-                    for (int i = 0; i < ic - 1; i++)
-                    {
-                        s += "unless " + IfItem[i] + " ";
-                    }
-                    if (ic == IfCount && IsContainElse)
-                        s += "unless " + IfItem.Last() + " ";
-                    else if (ic == IfCount && !IsContainElse)
-                        s += "if " + IfItem.Last() + " ";
+                    //ic++;
+                    //for (int i = 0; i < ic - 1; i++)
+                    //{
+                    //    s += "unless " + IfItem[i] + " ";
+                    //}
+                    //if (ic == IfCount && IsContainElse)
+                    //    s += "unless " + IfItem.Last() + " ";
+                    //else if (ic == IfCount && !IsContainElse)
+                        s += "if " + attr.Value + " ";
                 }
                 else if (attr.AttributeType == AttributeType.UNLESS)
                 {
-                    ic++;
-                    for (int i = 0; i < ic - 1; i++)
-                    {
-                        s += "unless " + IfItem[i] + " ";
-                    }
-                    if (ic == IfCount && IsContainElse)
-                        s += "unless " + IfItem.Last() + " ";
-                    else if (ic == IfCount && !IsContainElse)
-                        s += "unless " + IfItem.Last() + " ";
+                    //ic++;
+                    //for (int i = 0; i < ic - 1; i++)
+                    //{
+                    //    s += "unless " + IfItem[i] + " ";
+                    //}
+                    //if (ic == IfCount && IsContainElse)
+                    //    s += "unless " + IfItem.Last() + " ";
+                    //else if (ic == IfCount && !IsContainElse)
+                        s += "unless " + attr.Value + " ";
                 }
                 else if (attr.AttributeType == AttributeType.EXECUTE)
                 {
@@ -195,7 +195,7 @@ namespace MCFBuilder.Type.Compiler
         }
     }
 
-    public struct AttributeValue
+    public class AttributeValue
     {
         public string Value { get; set; }
         public AttributeType AttributeType { get; set; }

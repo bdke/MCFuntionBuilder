@@ -31,7 +31,7 @@ namespace MCFBuilder.Utility.BuiltIn.Class
             return Methods.FirstOrDefault(m => m.Name == name).Func.Invoke(this, args);
         }
 
-        public object? GetValue(string name)
+        public virtual object? GetValue(string name)
         {
             var props = GetType().GetProperty(name);
 
@@ -44,7 +44,7 @@ namespace MCFBuilder.Utility.BuiltIn.Class
                 throw new ArgumentException();
             }
         }
-        public void SetValue(string name, object? value)
+        public virtual void SetValue(string name, object? value)
         {
             var props = GetType().GetProperty(name);
 
