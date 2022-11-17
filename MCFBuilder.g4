@@ -58,13 +58,13 @@ generalAssignment: localAssignment || operation;
 
 localTagsAssignment: 'tag' 'var' IDENTIFIER (selector '=' BOOL)? ;
 localAssignment: 'var' IDENTIFIER ('=' expression)? ;
-localScoresAssignment: 'score' 'var' IDENTIFIER (selector '=' expression)?;
+localScoresAssignment: 'score' 'var' IDENTIFIER selector '=' expression;
 
 global: globalAssignment || globalScoresAssignment || globalTagsAssignment ;
 
 globalTagsAssignment: 'tag' 'global' IDENTIFIER (selector '=' BOOL)? ;
 globalAssignment: 'global' IDENTIFIER ('=' expression)? ;
-globalScoresAssignment: 'score' 'global' IDENTIFIER (selector '=' expression)?;
+globalScoresAssignment: 'score' 'global' IDENTIFIER selector '=' expression;
 
 operation: expression selector? assignOp expression ;
 // scoresOperation: 'score' IDENTIFIER selector assignOp expression ;
@@ -141,6 +141,6 @@ command: COMMAND ;
 COMMAND: '/' ~[\r\n]*;
 COMMENT: '//' ~[\r\n]* -> skip;
 WS: [ \t\r\n]+ -> skip;
-IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+IDENTIFIER: [a-zA-Z0-9_][a-zA-Z0-9_]*;
 SEMI: ';';
 

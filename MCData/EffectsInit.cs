@@ -30,7 +30,8 @@ namespace MCFBuilder.MCData
 
         public static void Init()
         {
-            List<JsonEffectsData> effectsDatas = JsonConvert.DeserializeObject<List<JsonEffectsData>>(File.ReadAllText(@"MCData/Datas/Effects.json"));
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            List<JsonEffectsData> effectsDatas = JsonConvert.DeserializeObject<List<JsonEffectsData>>(File.ReadAllText(@$"{baseDir}/MCData/Datas/Effects.json"));
             foreach (var effectsData in effectsDatas)
             {
                 EffectsData data = new();

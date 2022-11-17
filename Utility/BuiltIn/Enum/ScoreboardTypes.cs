@@ -21,7 +21,30 @@ namespace MCFBuilder.Utility.BuiltIn.Enum
         public const string ARMOR = "armor";
         public ScoreboardTypes() : base(typeof(ScoreboardTypes))
         {
+            
+        }
 
+        public static object? GetTypes(object?[]? args)
+        {
+            return new string[]
+            {
+                nameof(DUMMY),
+                nameof(TRIGGER),
+                nameof(DEATH_COUNT),
+                nameof(PLAYER_KILL_COUNT),
+                nameof(TOTAL_KILL_COUNT),
+                nameof(HEALTH),
+                nameof(XP),
+                nameof(LEVEL),
+                nameof(FOOD),
+                nameof(AIR),
+                nameof(ARMOR)
+            };
+        }
+
+        public override object? GetValue(string name)
+        {
+            return GetType().GetField(name).GetValue(null);
         }
     }
 }

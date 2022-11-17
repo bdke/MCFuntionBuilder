@@ -170,8 +170,10 @@ namespace MCFBuilder
             }
             else if (ProgramVariables.BuiltInClasses.ContainsKey(context.classVariables().IDENTIFIER(0).GetText()))
             {
-                return ProgramVariables.BuiltInClasses[context.classVariables().IDENTIFIER(0).GetText()]
-                    .GetField(context.classVariables().IDENTIFIER(1).GetText()).GetValue(null);
+                var type = ProgramVariables.BuiltInClasses[context.classVariables().IDENTIFIER(0).GetText()];
+                var @class = (BuiltInClass?)Activator.CreateInstance(type, null);
+                return @class.GetValue(name);
+                    //.GetField(context.classVariables().IDENTIFIER(1).GetText()).GetValue(null);
             }
 
             return null;

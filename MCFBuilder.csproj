@@ -38,7 +38,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="MCData\Datas\Blocks.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="MCData\Datas\Effects.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="MCData\Datas\Entities.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="MCData\Datas\Items.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="MCData\Datas\Statistics.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="NLog.xsd">

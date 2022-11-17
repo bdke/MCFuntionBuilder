@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using Antlr4.Runtime.Misc;
 using MCFBuilder.MCData;
+using MCFBuilder.Utility.BuiltIn.Enum;
 
 namespace MCFBuilder
 {
@@ -24,7 +25,6 @@ namespace MCFBuilder
         public static string? CurrentFile { get; set; }
         private static ArgsOptions Options = new() { };
         private static List<string> Commands { get; set; } = new();
-
 
         [Time($"Compiled code...")]
         public static async Task Run(string filePath)
@@ -66,6 +66,10 @@ namespace MCFBuilder
         {
             //Init
             EffectsDatas.Init();
+            StatisticsCustomTypes.Init();
+            MinecraftItems.Init();
+            MinecraftBlocks.Init();
+            MinecraftEntities.Init();
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -173,7 +177,7 @@ namespace MCFBuilder
 
         private async static Task<int> New()
         {
-            string name = Commands[0].ToLower();
+            string name = Commands[1].ToLower();
             int? version;
             if (Options.Version == null)
             {
@@ -217,7 +221,24 @@ namespace MCFBuilder
             Directory.CreateDirectory($"{name}/data/{name}/functions");
             Directory.CreateDirectory($"{name}/data/{name}/predicates");
             Directory.CreateDirectory($"{name}/data/{name}/loot_tables");
+            Directory.CreateDirectory($"{name}/data/{name}/dimension");
+            Directory.CreateDirectory($"{name}/data/{name}/dimension_type");
+            Directory.CreateDirectory($"{name}/data/{name}/tags");
+            Directory.CreateDirectory($"{name}/data/{name}/recipes");
+            Directory.CreateDirectory($"{name}/data/{name}/structures");
             Directory.CreateDirectory($"{name}/scripts");
+
+            Directory.CreateDirectory($"{name}/data/minecraft/tags");
+            await File.WriteAllTextAsync($"{name}/data/minecraft/tags/load.json", $@"{{
+    ""values"": [
+        ""{name}:load""
+    ]
+}}");
+            await File.WriteAllTextAsync($"{name}/data/minecraft/tags/tick.json", $@"{{
+    ""values"": [
+        ""{name}:tick""
+    ]
+}}");
 
             Console.WriteLine($"created new namespace: {name}");
             return 0;

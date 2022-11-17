@@ -24,6 +24,13 @@ namespace MCFBuilder.Utility
             [nameof(Selector)] = typeof(Selector),
             [nameof(Function)] = typeof(Function),
             [nameof(EffectTypes)] = typeof(EffectTypes),
+            [nameof(StatisticsTypes)] = typeof(StatisticsTypes),
+            [nameof(StatisticsCustomTypes)] = typeof(StatisticsCustomTypes),
+            [nameof(Utility.BuiltIn.Class.Scoreboard)] = typeof(Utility.BuiltIn.Class.Scoreboard),
+            [nameof(ScoreboardTypes)] = typeof(ScoreboardTypes),
+            ["Items"] = typeof(MinecraftItems),
+            ["Blocks"] = typeof(MinecraftBlocks),
+            ["Entities"] = typeof(MinecraftEntities)
         };
 
         public static Dictionary<string, object?> GlobalVariables { get; } = VariablesInit();
